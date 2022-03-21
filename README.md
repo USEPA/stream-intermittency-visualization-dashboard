@@ -1,5 +1,3 @@
-# stream-intermittency-visualization-dashboard
-
 # Stream Intermittency Visualization Dashboard (SIVD)
 
 ## Project Description
