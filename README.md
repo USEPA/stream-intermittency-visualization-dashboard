@@ -1,9 +1,7 @@
 # Stream Intermittency Visualization Dashboard (SIVD)
 
 ## Project Description
-The SIVD tool provides researchers and practitioners alike the ability to analyze high frequency stream temperature, intermittency, and conductivity (STIC; [Chapin et al. 2014](https://doi.org/10.1002/2013WR015158)) logger data and associated datasets in an environment that promotes interactivity and data exploration.
-  STIC logger data and field observation data used for this example dashboard come from a study quantifying days of flow versus no-flow for 183 stream reaches across the Great Plains and Midwest regions of the United States.  
-
+The SIVD tool provides the ability to analyze high frequency Stream, Temperature, Intermittency and Conductivity (STIC; [Chapin et al. 2014](https://doi.org/10.1002/2013WR015158)) logger data, field observations and associated datasets in an environment that promotes interactivity and data exploration. This dashboards facilitated data processing related to stream data collection efforts at 180 perennial and non-perennial sites across the Great Plains and Upper Midwest of the United States.  The dashboard served multiple purposes as part of data processing and analysis workflow, 1) to visualize multiple data streams of high frequency sensor data, 2) to have at-a-glance hydrologic metrics created during and after data processing, and 3) to view data quality metrics we created to describe high-frequency dataset quality (e.g. length, completeness). We provide an example dataset and the R code used to create the Shiny dashboard. We also created a video that shows an example of how the dashboard was used to visualize data and infer wet and dry periods in a stream reach.
 ## Usage
 ### Code
 Code in this repository can be used to generate the Shiny dashboard.  There are two R files used to create the SIVD.
