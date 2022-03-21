@@ -35,7 +35,7 @@ temp.raw <- as.data.frame(read.csv(
 
 # Logger data summary
 log.data.sum <- as.data.frame(read.csv(
-        "GP_P1-3_summary_2022-03-16.csv",
+        "GP_P1-3_summary_2022-03-21.csv",
         stringsAsFactors = FALSE)) 
 
 # S123 field data
