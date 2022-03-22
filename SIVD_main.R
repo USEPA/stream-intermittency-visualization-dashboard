@@ -24,23 +24,23 @@ library(tableHTML)
 
 # Raw daily data
 log.data.raw <- as.data.frame(read.csv(
-        "GP_P1-3_logger_daily_2022-03-16.csv",
+        "GP_P1-3_logger_daily_2022-03-22.csv",
         stringsAsFactors = FALSE)) %>%
         mutate(missing.rec = recLength - total.rec.values) 
 
 # Raw temp hourly data
 temp.raw <- as.data.frame(read.csv(
-        "GP_P1-3_logger_hourly_2022-03-16.csv",
+        "GP_P1-3_logger_hourly_2022-03-22.csv",
         stringsAsFactors = FALSE))
 
 # Logger data summary
 log.data.sum <- as.data.frame(read.csv(
-        "GP_P1-3_summary_2022-03-21.csv",
+        "GP_P1-3_summary_2022-03-22.csv",
         stringsAsFactors = FALSE)) 
 
 # S123 field data
 s123.data <- as.data.frame(read.csv(
-        "S123_field_data_2022-03-15.csv",
+        "S123_field_data_2022-03-22.csv",
         stringsAsFactors = FALSE)) 
 
 # Selection Lists
@@ -60,7 +60,7 @@ convertMenuItem <- function(mi,tabName) {
 # UI----------------------------------------------------------------------------
 
 ui <- dashboardPage(
-        title = "GP P1-P3 Logger Data",
+        title = "Stream Intermittency Visualization Dashboard",
         dashboardHeader(
                 
                 # Set height of dashboardHeader
@@ -73,8 +73,8 @@ ui <- dashboardPage(
                         tags$style(".main-header .navbar{background-color: #005ea2 !important}")
                 ),
                 titleWidth = 300,
-                title = span("GP P1-P3 Loggers",
-                             style = "color: #dedbd3; font-size: 22px; font-weight: bold")
+                title = span("",
+                             style = "color: #dedbd3; font-size: 14px; font-weight: bold")
         ),
         
         ## Side Bar Menu-----
@@ -88,7 +88,7 @@ ui <- dashboardPage(
                          
                          sidebarMenu(
                                  convertMenuItem(
-                                         menuItem("Site Dashboard",
+                                         menuItem("Visualization Splash Board",
                                                   startExpanded = TRUE, 
                                                   tabName = "home", 
                                                   icon = icon("dashboard"),
@@ -124,6 +124,7 @@ ui <- dashboardPage(
                                                               "Select UID", 
                                                               width = '80%',
                                                               choices = log.uid,
+                                                              # options = list('actions-box' = TRUE),
                                                               multiple = FALSE,
                                                               selected = "COCB1_L1"),
                                                   pickerInput("raw_columns", "Select Columns", width = '89%',
@@ -134,7 +135,7 @@ ui <- dashboardPage(
                                  ),
                                  tabName = "site_data"),
                                  convertMenuItem(
-                                         menuItem("Summary Logger Data",
+                                         menuItem("Data Quality Rankings",
                                                   tabName = "site_data2",
                                                   icon = icon("database"),
                                                   pickerInput("sum_columns", "Select Columns", width = '89%',
@@ -162,6 +163,23 @@ ui <- dashboardPage(
         
         ## Dashboard Body-------------------------------------------------------
         dashboardBody(
+                # Code to add title to the right side of dashboard header
+                tags$head(tags$style(HTML(
+                        '.myClass { 
+                        font-size: 20px;
+                        line-height: 50px;
+                        text-align: left;
+                        font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+                        padding: 0 15px;
+                        overflow: hidden;
+                        color: white;
+                      }
+                    '))),
+                                tags$script(HTML('
+                      $(document).ready(function() {
+                        $("header").find("nav").append(\'<span class="myClass"> Stream Intermittency Visualization Dashboard </span>\');
+                      })
+                     ')),
                 tabItems(
                         tabItem(tabName = "home", 
                                 setBackgroundColor(c("#798291", "#f5faf6"),
@@ -189,6 +207,7 @@ ui <- dashboardPage(
                                                                          actionButton("temp.button", "Temp Overlay"),
                                                                          actionButton("thourly.button", "Hourly Temp Graph"),
                                                                          actionButton("reset.button", "Reset Graph"),
+                                                                         
                                                                          plotlyOutput("intensity.l1",
                                                                                       height = "300px"))
                                                ),
@@ -329,7 +348,7 @@ ui <- dashboardPage(
                                                    shinydashboard = TRUE),
                                 box(width = 10,
                                     status = "danger",
-                                    title = "Raw Site Data",
+                                    title = "Daily Logger Data",
                                     solidHeader = TRUE,
                                     div(style = 'overflow-x: scroll',
                                         DT::dataTableOutput("rawdata")
@@ -345,7 +364,7 @@ ui <- dashboardPage(
                                                    shinydashboard = TRUE),
                                 box(width = 10,
                                     status = "danger",
-                                    title = "Summary Data",
+                                    title = "Data Quality Rankings",
                                     solidHeader = TRUE,
                                     div(style = 'overflow-x: scroll',
                                         DT::dataTableOutput("sumdata")
@@ -377,16 +396,17 @@ ui <- dashboardPage(
 server <- function(input, output, session) {
 
         # load html table code
-        source("HTML_tables.R", local = TRUE)
+        source("server_html_table_demoApp.R", local = TRUE)
 
         # intro modal
         showModal(modalDialog(
                 title = "App Instructions",
-                HTML("<strong>Welcome to the Great Plains Flow Duration Logger Data App! </strong><br>
+                HTML("<strong>Welcome to the Stream Intermittency Visualization Dashboard</strong><br>
                         <br>
-                     Data for field visits 1 through 4 are currently available for the Great Plains. <br>
-                     Summary data and graphics are available in the dashboard tab. <br> Raw
-                     data is available for download and viewing in the data table tabs.")
+                A sample dataset for Stream Temperature, Intermittency and Conductivity (STIC) loggers is presented along with PRISM precipitation data for the same period of record. 
+                Summary data table and graphics are available for visualization using the splash board tab.
+                Raw data is available for download and viewing in the data table tabs.
+")
                 )
         )
 
@@ -403,6 +423,7 @@ server <- function(input, output, session) {
                             "Select Site Code",
                             width = '80%',
                             choices = log.sc,
+                            # options = list('actions-box' = TRUE),
                             multiple = FALSE)
         })
         
@@ -435,6 +456,7 @@ server <- function(input, output, session) {
         # Server inputs for UI
         var <- eventReactive(c(input$tabs, input$site.code, filteredData()), {
                 input$tabs
+                # print(var)
         })
 
         output$panelStatus <- renderText({
@@ -840,6 +862,7 @@ server <- function(input, output, session) {
                                                      line = list(color = 'black', width = 5),
                                                      name = 'Field Visit',
                                                      showlegend = FALSE)
+                                # ggplotly(p, width = '100%', height = 100)
                                 
                         } else {
                                 p
@@ -854,6 +877,7 @@ server <- function(input, output, session) {
                                                      yend = max(intensity.data.l1$mean.intensity, na.rm = TRUE) + 2000,
                                                      line = list(color = 'black', width = 5),
                                                      name = 'Field Visit')
+                                # ggplotly(p, width = '100%', height = 100)
                                 
                         } else {
                                 p
@@ -979,6 +1003,7 @@ server <- function(input, output, session) {
                                                      line = list(color = 'black', width = 5),
                                                      name = 'Field Visit',
                                                      showlegend = FALSE)
+                                # ggplotly(p, width = '100%', height = 100)
                                 
                         } else {
                                 p
@@ -1116,6 +1141,7 @@ server <- function(input, output, session) {
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Field Visit',
                                                              showlegend = FALSE)
+                                        # ggplotly(p, width = '100%', height = 100)
                                         
                                 } else {
                                         p
@@ -1222,6 +1248,7 @@ server <- function(input, output, session) {
                                                 yaxis = list(title = "Intensity",
                                                              showGrid = TRUE),
                                                 yaxis2 = y2,
+                                                # yaxis3 = y3,
                                                 legend = list(orientation = 'h'),
                                                 plot_bgcolor = "#e5ecf6",
                                                 bargap = 0,
@@ -1252,6 +1279,7 @@ server <- function(input, output, session) {
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Field Visit',
                                                              showlegend = FALSE)
+                                        # ggplotly(p, width = '100%', height = 100)
                                         
                                 } else {
                                         p
@@ -1365,6 +1393,7 @@ server <- function(input, output, session) {
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Field Visit',
                                                              showlegend = FALSE)
+                                        # ggplotly(p, width = '100%', height = 100)
                                         
                                 } else {
                                         p
@@ -1459,6 +1488,7 @@ server <- function(input, output, session) {
                                                      line = list(color = 'black', width = 5),
                                                      name = 'Field Visit',
                                                      showlegend = FALSE)
+                                # ggplotly(p, width = '100%', height = 100)
                                 
                         } else {
                                 p
@@ -1544,7 +1574,9 @@ server <- function(input, output, session) {
                                         titlefont = list(color = "#c20c06"),
                                         overlaying = "y",
                                         side = "right",
+                                        # anchor="free",
                                         automargin = TRUE,
+                                        # position=.95,
                                         title = "Daily Mean Temp. (F)")
                                 
                                 p <- plot_ly(intensity.data.l2,
@@ -1559,6 +1591,7 @@ server <- function(input, output, session) {
                                                 yaxis = list(title = "Daily Mean Intensity",
                                                              showGrid = TRUE),
                                                 yaxis2 = y2,
+                                                # yaxis3 = y3,
                                                 legend = list(orientation = 'h'),
                                                 plot_bgcolor = "#e5ecf6",
                                                 bargap = 0,
@@ -1593,6 +1626,7 @@ server <- function(input, output, session) {
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Field Visit',
                                                              showlegend = FALSE)
+                                        # ggplotly(p, width = '100%', height = 100)
                                         
                                 } else {
                                         p
@@ -1694,6 +1728,7 @@ server <- function(input, output, session) {
                                                 yaxis = list(title = "Daily Mean Intensity",
                                                              showGrid = TRUE),
                                                 yaxis2 = y2,
+                                                # yaxis3 = y3,
                                                 legend = list(orientation = 'h'),
                                                 plot_bgcolor = "#e5ecf6",
                                                 bargap = 0,
@@ -1728,6 +1763,8 @@ server <- function(input, output, session) {
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Field Visit',
                                                              showlegend = FALSE)
+                                        # ggplotly(p, width = '100%', height = 100)
+                                        
                                 } else {
                                         p
                                 }
@@ -1868,6 +1905,7 @@ server <- function(input, output, session) {
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Field Visit',
                                                              showlegend = FALSE)
+                                        # ggplotly(p, width = '100%', height = 100)
                                         
                                 } else {
                                         p
@@ -1985,6 +2023,7 @@ server <- function(input, output, session) {
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Field Visit',
                                                              showlegend = FALSE)
+                                        # ggplotly(p, width = '100%', height = 100)
                                         
                                 } else {
                                         p
@@ -2111,7 +2150,7 @@ server <- function(input, output, session) {
 
         
         # Data Tables------
-        # filter data and columns
+        
         filteredRaw <- eventReactive(c(input$data.uid, input$raw_columns), {
                 
                 if(!is.null(input$raw_columns)){
@@ -2177,6 +2216,7 @@ server <- function(input, output, session) {
              
                         DT::datatable(filteredSumColumns(),
                                   extensions = c('Buttons'),
+                                  # escape = FALSE,
                                   filter = "top",
                                   options = list(
                                           autoWidth = TRUE,
@@ -2206,6 +2246,7 @@ server <- function(input, output, session) {
                 output$fielddata <- renderDT(server = FALSE, {
                         DT::datatable(filteredBaseline(),
                                       extensions = c('Buttons'),
+                                      # escape = FALSE,
                                       filter = "top",
                                       options = list(
                                               autoWidth = TRUE,
