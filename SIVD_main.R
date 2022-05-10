@@ -1,46 +1,51 @@
 # Packages----------------------------------------------------------------------
 library(shiny)
-library(shinybusy)
+library(shinycssloaders)
+library(shinydashboard)
+library(shinyWidgets)
 library(leafem)
 library(dplyr)
-library(magrittr)
-library(rgdal)
 library(leaflet)
+library(magrittr)
 library(plotly)
 library(sf)
-library(shinyWidgets)
 library(DT)
-library(shinydashboard)
 library(leaflet.extras)
 library(tidyr)
 library(lubridate)
-library(scales)
-library(padr)
 library(tableHTML)
+library(rstudioapi)
 
+
+# Set working directory to location of SIVD_main.R. This code needs to be removed
+# before deploying to a web server
+setwd(dirname(getActiveDocumentContext()$path))
 
 
 # Global------------------------------------------------------------------------
 
+# Suppress warnings
+options(warn = -1)
+
 # Raw daily data
 log.data.raw <- as.data.frame(read.csv(
-        "GP_P1-3_logger_daily_2022-03-22.csv",
+        "./Data/GP_P1-3_logger_daily_2022-03-22.csv",
         stringsAsFactors = FALSE)) %>%
         mutate(missing.rec = recLength - total.rec.values) 
 
 # Raw temp hourly data
 temp.raw <- as.data.frame(read.csv(
-        "GP_P1-3_logger_hourly_2022-03-22.csv",
+        "./Data/GP_P1-3_logger_hourly_2022-03-22.csv",
         stringsAsFactors = FALSE))
 
 # Logger data summary
 log.data.sum <- as.data.frame(read.csv(
-        "GP_P1-3_summary_2022-03-22.csv",
+        "./Data/GP_P1-3_summary_2022-03-22.csv",
         stringsAsFactors = FALSE)) 
 
 # S123 field data
 s123.data <- as.data.frame(read.csv(
-        "S123_field_data_2022-03-22.csv",
+        "./Data/S123_field_data_2022-03-22.csv",
         stringsAsFactors = FALSE)) 
 
 # Selection Lists
@@ -62,6 +67,10 @@ convertMenuItem <- function(mi,tabName) {
 ui <- dashboardPage(
         title = "Stream Intermittency Visualization Dashboard",
         dashboardHeader(
+                
+                # add help modal in dashboardHeader
+                tags$li(actionLink("helpModal", label = "", icon = icon("question")),
+                        class = "dropdown"),
                 
                 # Set height of dashboardHeader
                 tags$li(class = "dropdown",
@@ -93,7 +102,7 @@ ui <- dashboardPage(
                                                   tabName = "home", 
                                                   icon = icon("dashboard"),
                                                   # Filter sites by state
-                                                  pickerInput("state", "Select State", width = '89%',
+                                                  pickerInput("state", "Select State(s)", width = '89%',
                                                               choices = log.state, 
                                                               options = list('actions-box' = TRUE),
                                                               multiple = TRUE,
@@ -155,6 +164,12 @@ ui <- dashboardPage(
                                                               multiple = TRUE,
                                                               selected = names(s123.data))
                                          ),
+                                         tabName = "field_data"),
+                                 convertMenuItem(
+                                         menuItem("Dashboard Help",
+                                                  tabName = "dash_help",
+                                                  icon = icon("question")
+                                         ),
                                          tabName = "field_data")
 
                          )
@@ -205,20 +220,21 @@ ui <- dashboardPage(
                                                         conditionalPanel("output.panelStatus == 'Site L1 Data'", 
                                                                          actionButton("precip.button", "Precip Overlay"),
                                                                          actionButton("temp.button", "Temp Overlay"),
-                                                                         actionButton("thourly.button", "Hourly Temp Graph"),
+                                                                         actionButton("thourly.button", "Hourly Graph"),
                                                                          actionButton("reset.button", "Reset Graph"),
-                                                                         
+                                                                         withSpinner(
                                                                          plotlyOutput("intensity.l1",
-                                                                                      height = "300px"))
+                                                                                      height = "300px")))
                                                ),
                                                tabPanel("Site L2 Data",
                                                         conditionalPanel("output.panelStatus == 'Site L2 Data' & output.L2 == 'L2 Present'",
                                                                          actionButton("precip2.button", "Precip Overlay"),
                                                                          actionButton("temp2.button", "Temp Overlay"),
-                                                                         actionButton("thourly2.button", "Hourly Temp Graph"),
+                                                                         actionButton("thourly2.button", "Hourly Graph"),
                                                                          actionButton("reset2.button", "Reset Graph"),
+                                                                         withSpinner(
                                                                          plotlyOutput("intensity.l2",
-                                                                                      height = "300px")),
+                                                                                      height = "300px"))),
                                                         conditionalPanel(
                                                                 condition = "output.panelStatus == 'Site L2 Data' & output.L2 == 'L2 Not Present'",
                                                                 tags$div(id = 'box_l2', 
@@ -229,9 +245,9 @@ ui <- dashboardPage(
                                                ),
                                                tabPanel("Site L1 & L2 Data",
                                                         conditionalPanel("output.panelStatus == 'Site L1 & L2 Data' & output.L2 == 'L2 Present'",
-                                                                        
+                                                                        withSpinner(
                                                                          plotlyOutput("intensity.l1l2",
-                                                                                      height = "332px")),
+                                                                                      height = "332px"))),
                                                         conditionalPanel(
                                                                 condition = "output.panelStatus == 'Site L1 & L2 Data' & output.L2 == 'L2 Not Present'",
                                                                 tags$div(id = 'box_l2', 
@@ -385,7 +401,33 @@ ui <- dashboardPage(
                                         DT::dataTableOutput("fielddata")
                                     )
                                 )
-                        )
+                        ),
+                        ## Help tab---------------------------------------------
+                        tabItem(tabName = "dash_help",
+                                tags$head(tags$style(HTML( '.has-feedback .form-control { padding-right: 0px; width: 150% !important}' ))),
+                                setBackgroundColor(c("#798291", "#f5faf6"),
+                                                   gradient = "linear", direction = "left",
+                                                   shinydashboard = TRUE),
+                                box(width = 8,
+                                    status = "danger",
+                                    title = "Dashboard Help",
+                                    solidHeader = TRUE,
+                                    tags$div(id = 'help', 
+                                             class = 'help_class',
+                                             
+                                             span(HTML("<b>1)</b>	The Stream Intermittency Visualization dashboard runs off four tabs. Visualization Splash Board tab. This is the main visualization page for viewing multiple forms of data for a single site. To get started select one or more state(s) from the drop-down state menu. Using your mouse, you can adjust or keyboard to directly enter the minimum days to filter sites having a minimum number of days on record. Select a site from drop-down site code menu and the plots and data summaries for the selected site code will appear on the visualization splash board. The splash board includes high frequency logger and precipitation data, a pie chart of data record completeness for the logger data, aerial imagery of the site, and three tables that summarize logger data (Site Summary Metrics), data quality and field observations. For sites have duplicate data loggers the user can view plots from each logger separately (L1 or L2) or data from both loggers simultaneously (L1 & L2). With the daily mean intensity data the user can select overlaying daily total precipitation or daily mean temperature or select viewing hourly logger intensity and temperature data. Various tools are available for the user to capture image, zoom, pan, and identify specific values on plots.
+                                                                <br><br>
+                                                                <b>2</b>)	Daily Logger Data tab. This tab summarized the high frequency logger observations collected every hour into daily summary metrics. The column flow.binary.day presents the conversion of hourly intensity data to a binary determination of flow or no flow for a logger. The mean daily intensity was calculated from the hourly intensity for each day.  If the mean daily intensity was greater than the calibrated intensity value for the logger, the stream was considered flowing and flow.binary day is equal to 1.  This and other columns in the Daily Logger Data tab run the high frequency data and record completeness data visualizations on the dash board tab.
+                                                                <br><br>
+                                                                <b>3)</b>	Data Quality Rankings tab. This tab summarizes data from the Daily Logger Data tab for each logger and includes data presented in the Site Summary Metrics table and the Data Quality Rankings table. It calculates the total number of days expected for the period of record (recLength) based on the day the logger were deployed and retrieved and calculates the number of days intensity was recorded for each logger (total.rec.values). This tab also includes the total number of consecutive flow days (myear) and dry days (dyear) for the period of record of a logger    . Recency, length, and completeness confidence  columns present rankings based on criteria our research group decided would best describe logger datasets when compared to other high frequency datasets we used in our study (e.g. United State Geological Survey gage datasets). 
+                                                                <br><br>
+                                                                <b>4)</b>	Field Observations Data tab. This tab presents observational hydrologic data at each site visit. All sites within the Great Plains example dataset were visited up to four times, except for a few local sites that were visited five or six times  . Data in this tab are presented in the Field Observations table and include hydrologic observations describe the hydrologic condition (flow, no flow, isolated pools, interstitial flow) at the logger. It includes the max depth of water observed at a site and the percent of surface flow and sub surface flow observed within the study reach (hi_reachlengthsurface, hi_reachlengthsub, respectively). It also includes the Channel Score which is a relative index that describes the extent of surface flow in the reach with zero representing no surface flow and six representing continuous surface flow. The length of study reaches in the example dataset were 40X bankfull channel-widths or a maximum of 200 m. Visits corresponding with vertical black lines on plots in the visualization splash board can be individually selected by users to show associated field observation data.
+                                                        "),
+                                                  style = "font-size: 1.2em; font-color: Red; text-align: center;"))
+                                    )
+                                )
+                        
+                        
 
                 ) # End Tab Items
         ) # End Dashboard Body
@@ -396,25 +438,49 @@ ui <- dashboardPage(
 server <- function(input, output, session) {
 
         # load html table code
-        source("server_html_table_demoApp.R", local = TRUE)
+        source("HTML_tables.R", local = TRUE)
 
         # intro modal
-        showModal(modalDialog(
+        showModal(
+                modalDialog(
                 title = "App Instructions",
                 HTML("<strong>Welcome to the Stream Intermittency Visualization Dashboard</strong><br>
                         <br>
                 A sample dataset for Stream Temperature, Intermittency and Conductivity (STIC) loggers is presented along with PRISM precipitation data for the same period of record. 
                 Summary data table and graphics are available for visualization using the splash board tab.
                 Raw data is available for download and viewing in the data table tabs.
-")
+                        ")
                 )
         )
+        
+        # help modal
+        observeEvent(input$helpModal, {
+                showModal(
+                        modalDialog(title = "Dashboard Help",
+                                    HTML("<b>1)</b>	The Stream Intermittency Visualization dashboard runs off four tabs. Visualization Splash Board tab. This is the main visualization page for viewing multiple forms of data for a single site. To get started select one or more state(s) from the drop-down state menu. Using your mouse, you can adjust or keyboard to directly enter the minimum days to filter sites having a minimum number of days on record. Select a site from drop-down site code menu and the plots and data summaries for the selected site code will appear on the visualization splash board. The splash board includes high frequency logger and precipitation data, a pie chart of data record completeness for the logger data, aerial imagery of the site, and three tables that summarize logger data (Site Summary Metrics), data quality and field observations. For sites have duplicate data loggers the user can view plots from each logger separately (L1 or L2) or data from both loggers simultaneously (L1 & L2). With the daily mean intensity data the user can select overlaying daily total precipitation or daily mean temperature or select viewing hourly logger intensity and temperature data. Various tools are available for the user to capture image, zoom, pan, and identify specific values on plots.
+                                        <br><br>
+                                        <b>2</b>)	Daily Logger Data tab. This tab summarized the high frequency logger observations collected every hour into daily summary metrics. The column flow.binary.day presents the conversion of hourly intensity data to a binary determination of flow or no flow for a logger. The mean daily intensity was calculated from the hourly intensity for each day.  If the mean daily intensity was greater than the calibrated intensity value for the logger, the stream was considered flowing and flow.binary day is equal to 1.  This and other columns in the Daily Logger Data tab run the high frequency data and record completeness data visualizations on the dash board tab.
+                                        <br><br>
+                                        <b>3)</b>	Data Quality Rankings tab. This tab summarizes data from the Daily Logger Data tab for each logger and includes data presented in the Site Summary Metrics table and the Data Quality Rankings table. It calculates the total number of days expected for the period of record (recLength) based on the day the logger were deployed and retrieved and calculates the number of days intensity was recorded for each logger (total.rec.values). This tab also includes the total number of consecutive flow days (myear) and dry days (dyear) for the period of record of a logger    . Recency, length, and completeness confidence  columns present rankings based on criteria our research group decided would best describe logger datasets when compared to other high frequency datasets we used in our study (e.g. United State Geological Survey gage datasets). 
+                                        <br><br>
+                                        <b>4)</b>	Field Observations Data tab. This tab presents observational hydrologic data at each site visit. All sites within the Great Plains example dataset were visited up to four times, except for a few local sites that were visited five or six times  . Data in this tab are presented in the Field Observations table and include hydrologic observations describe the hydrologic condition (flow, no flow, isolated pools, interstitial flow) at the logger. It includes the max depth of water observed at a site and the percent of surface flow and sub surface flow observed within the study reach (hi_reachlengthsurface, hi_reachlengthsub, respectively). It also includes the Channel Score which is a relative index that describes the extent of surface flow in the reach with zero representing no surface flow and six representing continuous surface flow. The length of study reaches in the example dataset were 40X bankfull channel-widths or a maximum of 200 m. Visits corresponding with vertical black lines on plots in the visualization splash board can be individually selected by users to show associated field observation data.
+                                ")
+                         )
+                )
+        })
 
         # Filter data by state and update input
         output$site.code <- renderUI({
                 data.days.sort <- log.data.sum %>%
                         filter(total.data.days >= input$totaldays)
-                
+                # Error event when input$state == NULL
+                if(is.null(input$state)){
+                        show_alert(
+                                title = "Error!",
+                                text = "No State Selected!",
+                                type = "error"
+                        )
+                } else {
                 state.data <- log.data.raw %>% 
                         filter(state.name == input$state  
                                & UID %in% data.days.sort$UID)
@@ -423,10 +489,10 @@ server <- function(input, output, session) {
                             "Select Site Code",
                             width = '80%',
                             choices = log.sc,
-                            # options = list('actions-box' = TRUE),
                             multiple = FALSE)
+                }
         })
-        
+
         # Error event when input$site.code == NULL
         observeEvent(input$site.code, {
                 if(input$site.code == ''){
@@ -823,7 +889,7 @@ server <- function(input, output, session) {
                 }
                 
                 
-                #### l1 intensity plot----
+                # l1 intensity plot----
                 output$intensity.l1 <- renderPlotly({
 
                         p <- plot_ly(intensity.data.l1,
@@ -835,7 +901,7 @@ server <- function(input, output, session) {
                                      name = "Daily Mean Intensity") %>%
                                 layout(
                                         xaxis = list(title = ""),
-                                        yaxis = list(title = "Daily Mean Intensity",
+                                        yaxis = list(title = "Daily Mean Intensity (lum/ft<sup>2</sup>) ",
                                                      showGrid = TRUE),
                                         legend = list(orientation = 'h'),
                                         plot_bgcolor = "#e5ecf6",
@@ -862,7 +928,6 @@ server <- function(input, output, session) {
                                                      line = list(color = 'black', width = 5),
                                                      name = 'Field Visit',
                                                      showlegend = FALSE)
-                                # ggplotly(p, width = '100%', height = 100)
                                 
                         } else {
                                 p
@@ -877,7 +942,6 @@ server <- function(input, output, session) {
                                                      yend = max(intensity.data.l1$mean.intensity, na.rm = TRUE) + 2000,
                                                      line = list(color = 'black', width = 5),
                                                      name = 'Field Visit')
-                                # ggplotly(p, width = '100%', height = 100)
                                 
                         } else {
                                 p
@@ -966,7 +1030,7 @@ server <- function(input, output, session) {
                                      name = "Daily Mean Intensity") %>%
                                 layout(
                                         xaxis = list(title = ""),
-                                        yaxis = list(title = "Daily Mean Intensity",
+                                        yaxis = list(title = "Daily Mean Intensity (lum/ft<sup>2</sup>) ",
                                                      showGrid = TRUE),
                                         yaxis2 = y2,
                                         legend = list(orientation = 'h'),
@@ -1103,7 +1167,7 @@ server <- function(input, output, session) {
                                              name = "Daily Mean Intensity") %>%
                                         layout(
                                                 xaxis = list(title = ""),
-                                                yaxis = list(title = "Daily Mean Intensity",
+                                                yaxis = list(title = "Daily Mean Intensity (lum/ft<sup>2</sup>) ",
                                                              showGrid = TRUE),
                                                 yaxis2 = y2,
                                                 # yaxis3 = y3,
@@ -1234,7 +1298,7 @@ server <- function(input, output, session) {
                                         side = "right",
                                         automargin = TRUE,
                                         rangemode = "tozero",
-                                        title = "Temp. (F)")
+                                        title = "Hourly Temp. (F)")
                                 
                                 p <- plot_ly(temp.data.l1,
                                              x = ~as_datetime(temp.data.l1$DateFormat),
@@ -1245,7 +1309,7 @@ server <- function(input, output, session) {
                                              name = "Hourly Intensity") %>%
                                         layout(
                                                 xaxis = list(title = ""),
-                                                yaxis = list(title = "Intensity",
+                                                yaxis = list(title = "Hourly Intensity (lum/ft<sup>2</sup>)",
                                                              showGrid = TRUE),
                                                 yaxis2 = y2,
                                                 # yaxis3 = y3,
@@ -1366,7 +1430,7 @@ server <- function(input, output, session) {
                                              name = "Daily Mean Intensity") %>%
                                         layout(
                                                 xaxis = list(title = ""),
-                                                yaxis = list(title = "Daily Mean Intensity",
+                                                yaxis = list(title = "Daily Mean Intensity (lum/ft<sup>2</sup>) ",
                                                              showGrid = TRUE),
                                                 legend = list(orientation = 'h'),
                                                 plot_bgcolor = "#e5ecf6",
@@ -1459,7 +1523,7 @@ server <- function(input, output, session) {
                                      name = "Daily Mean Intensity") %>%
                                 layout(
                                         xaxis = list(title = ""),
-                                        yaxis = list(title = "Daily Mean Intensity",
+                                        yaxis = list(title = "Daily Mean Intensity (lum/ft<sup>2</sup>) ",
                                                      showGrid = TRUE),
                                         # yaxis2 = y2,
                                         # yaxis3 = y3,
@@ -1588,7 +1652,7 @@ server <- function(input, output, session) {
                                              name = "Daily Mean Intensity") %>%
                                         layout(
                                                 xaxis = list(title = ""),
-                                                yaxis = list(title = "Daily Mean Intensity",
+                                                yaxis = list(title = "Daily Mean Intensity (lum/ft<sup>2</sup>) ",
                                                              showGrid = TRUE),
                                                 yaxis2 = y2,
                                                 # yaxis3 = y3,
@@ -1725,7 +1789,7 @@ server <- function(input, output, session) {
                                              name = "Daily Mean Intensity") %>%
                                         layout(
                                                 xaxis = list(title = ""),
-                                                yaxis = list(title = "Daily Mean Intensity",
+                                                yaxis = list(title = "Daily Mean Intensity (lum/ft<sup>2</sup>) ",
                                                              showGrid = TRUE),
                                                 yaxis2 = y2,
                                                 # yaxis3 = y3,
@@ -1860,7 +1924,7 @@ server <- function(input, output, session) {
                                         overlaying = "y",
                                         side = "right",
                                         automargin = TRUE,
-                                        title = "Temp. (F)")
+                                        title = "Hourly Temp. (F)")
                                 
                                 p <- plot_ly(temp.data.l2,
                                              x = ~as_datetime(temp.data.l2$DateFormat),
@@ -1871,7 +1935,7 @@ server <- function(input, output, session) {
                                              name = "Hourly Intensity") %>%
                                         layout(
                                                 xaxis = list(title = ""),
-                                                yaxis = list(title = "Intensity",
+                                                yaxis = list(title = "Hourly Intensity (lum/ft<sup>2</sup>)",
                                                              showGrid = TRUE),
                                                 yaxis2 = y2,
                                                 legend = list(orientation = 'h'),
@@ -1996,7 +2060,7 @@ server <- function(input, output, session) {
                                              name = "Daily Mean Intensity") %>%
                                         layout(
                                                 xaxis = list(title = ""),
-                                                yaxis = list(title = "Daily Mean Intensity",
+                                                yaxis = list(title = "Daily Mean Intensity (lum/ft<sup>2</sup>) ",
                                                              showGrid = TRUE),
                                                 legend = list(orientation = 'h'),
                                                 plot_bgcolor = "#e5ecf6",
@@ -2127,7 +2191,7 @@ server <- function(input, output, session) {
                                 hovertemplate = paste('(%{x}, %{y})', '<extra></extra>'),
                                 name = "Daily Mean Intensity") %>%
                                 layout(xaxis = list(title = ""),
-                                       yaxis = list(title = "Daily Mean Intensity"),
+                                       yaxis = list(title = "Daily Mean Intensity (lum/ft<sup>2</sup>) "),
                                        plot_bgcolor = "#e5ecf6",
                                        bargap = 0,
                                        dragmode='pan') %>%
@@ -2191,9 +2255,9 @@ server <- function(input, output, session) {
                                       options = list(
                                               autoWidth = FALSE,
                                               scrollx = TRUE,
-                                              lengthMenu = c(5, 25, 50),
-                                              pageLength = 8,
-                                              dom = 'Bfrtip', 
+                                              lengthMenu = c(5, 10, 15),
+                                              pageLength = 5,
+                                              dom = 'Blfrtip', 
                                               buttons = list(
                                                       list(extend = "csv", text = "Download Current Page", filename = "page",
                                                            exportOptions = list(
@@ -2222,9 +2286,9 @@ server <- function(input, output, session) {
                                           autoWidth = TRUE,
                                           fixedColumns = TRUE,
                                           scrollx = TRUE,
-                                          lengthMenu = c(5, 25, 50),
-                                          pageLength = 8,
-                                          dom = 'Bfrtip', 
+                                          lengthMenu = c(5, 10, 15),
+                                          pageLength = 5,
+                                          dom = 'Blfrtip', 
                                           buttons =
                                                   list('copy', 'print', list(
                                                           extend = 'collection',
@@ -2252,9 +2316,9 @@ server <- function(input, output, session) {
                                               autoWidth = TRUE,
                                               fixedColumns = TRUE,
                                               scrollx = TRUE,
-                                              lengthMenu = c(5, 25, 50),
-                                              pageLength = 4,
-                                              dom = 'Bfrtip', 
+                                              lengthMenu = c(5, 10, 15),
+                                              pageLength = 5,
+                                              dom = 'Blfrtip', 
                                               buttons =
                                                       list('copy', 'print', list(
                                                               extend = 'collection',
