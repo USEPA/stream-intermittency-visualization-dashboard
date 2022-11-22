@@ -1,25 +1,9 @@
 # Packages----------------------------------------------------------------------
-library(shiny)
-library(shinycssloaders)
-library(shinydashboard)
-library(shinyWidgets)
-library(leafem)
-library(dplyr)
-library(leaflet)
-library(magrittr)
-library(plotly)
-library(sf)
-library(DT)
-library(leaflet.extras)
-library(tidyr)
-library(lubridate)
-library(tableHTML)
-library(rstudioapi)
 
+pacman::p_load(shiny, shinycssloaders, shinydashboard, shinyWidgets, leafem, dplyr,
+       leaflet, magrittr, plotly, sf, DT, leaflet.extras, tidyr, lubridate,
+       tableHTML)
 
-# Set working directory to location of SIVD_main.R. This code needs to be removed
-# before deploying to a web server
-setwd(dirname(getActiveDocumentContext()$path))
 
 
 # Global------------------------------------------------------------------------
@@ -31,7 +15,7 @@ options(warn = -1)
 log.data.raw <- as.data.frame(read.csv(
         "./Data/GP_P1-3_logger_daily_2022-03-22.csv",
         stringsAsFactors = FALSE)) %>%
-        mutate(missing.rec = recLength - total.rec.values) 
+        mutate(missing.rec = recLength - total.rec.values)
 
 # Raw temp hourly data
 temp.raw <- as.data.frame(read.csv(
@@ -69,7 +53,10 @@ ui <- dashboardPage(
         dashboardHeader(
                 
                 # add help modal in dashboardHeader
-                tags$li(actionLink("helpModal", label = "", icon = icon("question")),
+                tags$li(actionLink("helpModal", title = "Dashboard Help",label = "", icon = icon("question")),
+                        class = "dropdown"),
+                tags$li(tags$a(icon("code"), href="https://github.com/USEPA/stream-intermittency-visualization-dashboard",
+                               title = "Dashboard Code"),
                         class = "dropdown"),
                 
                 # Set height of dashboardHeader
@@ -102,7 +89,7 @@ ui <- dashboardPage(
                                                   tabName = "home", 
                                                   icon = icon("dashboard"),
                                                   # Filter sites by state
-                                                  pickerInput("state", "Select State(s)", width = '89%',
+                                                  pickerInput("state", "Select State", width = '89%',
                                                               choices = log.state, 
                                                               options = list('actions-box' = TRUE),
                                                               multiple = TRUE,
@@ -111,7 +98,7 @@ ui <- dashboardPage(
                                                   knobInput(
                                                           inputId = "totaldays",
                                                           label = "Minimum Days of Data",
-                                                          value = 50,
+                                                          value = 10,
                                                           min = 0,
                                                           rotation = 'anticlockwise',
                                                           max = max(log.data.sum$total.data.days, na.rm = TRUE),
@@ -369,7 +356,9 @@ ui <- dashboardPage(
                                     div(style = 'overflow-x: scroll',
                                         DT::dataTableOutput("rawdata")
                                         )
-                                )
+                                ),
+                                box(width = 10,
+                                div("PRISM Climate Group, Oregon State University, https://prism.oregonstate.edu, data created 6 Dec 2021, accessed 6 Dec 2021."))
                         ), # End Tab Item
                         
                         ## Sum Data tab--------------------------------------------
@@ -449,6 +438,9 @@ server <- function(input, output, session) {
                 A sample dataset for Stream Temperature, Intermittency and Conductivity (STIC) loggers is presented along with PRISM precipitation data for the same period of record. 
                 Summary data table and graphics are available for visualization using the splash board tab.
                 Raw data is available for download and viewing in the data table tabs.
+                <br>
+                <br>
+                <i>PRISM Climate Group, Oregon State University, https://prism.oregonstate.edu, data created 6 Dec 2021, accessed 6 Dec 2021.</i>
                         ")
                 )
         )
@@ -468,6 +460,7 @@ server <- function(input, output, session) {
                          )
                 )
         })
+        
 
         # Filter data by state and update input
         output$site.code <- renderUI({
@@ -845,13 +838,13 @@ server <- function(input, output, session) {
                                                 by = "day")) %>%
                         # create variable to show bars for missing days
                         mutate(intensity.na = case_when(
-                                is.na(mean.intensity) ~ max(mean.intensity, na.rm = TRUE) + 500
+                                is.na(mean.intensity.lum_ft2) ~ max(mean.intensity.lum_ft2, na.rm = TRUE) + 500
                                 )
                         )
                 temp.data.l1 <- tempFiltered() %>%
                         filter(Site.L == "L1") %>%
                         mutate(intensity.na = case_when(
-                                is.na(Intensity) ~ max(Intensity, na.rm = TRUE) + 500
+                                is.na(intensity.lum_ft2) ~ max(intensity.lum_ft2, na.rm = TRUE) + 500
                                 )
                         )
 
@@ -873,7 +866,7 @@ server <- function(input, output, session) {
                                                 by = "day")) %>%
                         # create variable to show bars for missing days
                         mutate(intensity.na = case_when(
-                                is.na(mean.intensity) ~ max(mean.intensity, na.rm = TRUE) + 500
+                                is.na(mean.intensity.lum_ft2) ~ max(mean.intensity.lum_ft2, na.rm = TRUE) + 500
                                 )
                         )
                 }
@@ -882,7 +875,7 @@ server <- function(input, output, session) {
                 temp.data.l2 <- tempFiltered() %>%
                         filter(Site.L == "L2") %>%
                         mutate(intensity.na = case_when(
-                                is.na(Intensity) ~ max(Intensity, na.rm = TRUE) + 500
+                                is.na(intensity.lum_ft2) ~ max(intensity.lum_ft2, na.rm = TRUE) + 500
                                 )
                         )
 
@@ -894,7 +887,7 @@ server <- function(input, output, session) {
 
                         p <- plot_ly(intensity.data.l1,
                                      x = ~as.Date(intensity.data.l1$day),
-                                     y = round(intensity.data.l1$mean.intensity, 1),
+                                     y = round(intensity.data.l1$mean.intensity.lum_ft2, 1),
                                      type = "bar",
                                      opacity = 0.7,
                                      hovertemplate = paste('(%{x}, %{y})', '<extra></extra>'),
@@ -912,19 +905,21 @@ server <- function(input, output, session) {
                                  name = "Missing Data", opacity = 0.6,
                                  hovertemplate = "", 
                                  marker = list(color = 'pink')) %>%
-                                add_segments(x = min(intensity.data.l1$day),
-                                             xend = max(intensity.data.l1$day),
-                                             y = min(intensity.data.l1$Cal.Intensity),
-                                             yend = min(intensity.data.l1$Cal.Intensity),
-                                             name = paste0("Calibration Intensity (", min(intensity.data.l1$Cal.Intensity),")"),
-                                             line = list(color = 'orange', width = 3))
+                                add_trace(
+                                        x = ~as_datetime(intensity.data.l1$day),
+                                        y = intensity.data.l1$cal.intensity.lum_ft2,
+                                        type = "scatter",
+                                        mode = "lines",
+                                        name = "Calibration Intensity",
+                                        line = list(color = 'orange', width = 3)
+                                )
                         
                         if(!is.na(max(intensity.data.l1$per1.start, na.rm = TRUE))){
                                 p <- p %>%
                                         add_segments(x = as.Date(min(intensity.data.l1$per1.start, na.rm = TRUE)),
                                                      xend = as.Date(min(intensity.data.l1$per1.start, na.rm = TRUE)),
                                                      y = 0,
-                                                     yend = max(intensity.data.l1$mean.intensity, na.rm = TRUE) + 2000,
+                                                     yend = max(intensity.data.l1$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                      line = list(color = 'black', width = 5),
                                                      name = 'Field Visit',
                                                      showlegend = FALSE)
@@ -939,7 +934,7 @@ server <- function(input, output, session) {
                                         add_segments(x = as.Date(min(intensity.data.l1$per1.end.date, na.rm = TRUE)),
                                                      xend = as.Date(min(intensity.data.l1$per1.end.date, na.rm = TRUE)),
                                                      y = 0,
-                                                     yend = max(intensity.data.l1$mean.intensity, na.rm = TRUE) + 2000,
+                                                     yend = max(intensity.data.l1$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                      line = list(color = 'black', width = 5),
                                                      name = 'Field Visit')
                                 
@@ -952,7 +947,7 @@ server <- function(input, output, session) {
                                         add_segments(x = as.Date(min(intensity.data.l1$per2.end.date, na.rm = TRUE)),
                                                      xend = as.Date(min(intensity.data.l1$per2.end.date, na.rm = TRUE)),
                                                      y = 0,
-                                                     yend = max(intensity.data.l1$mean.intensity, na.rm = TRUE) + 2000,
+                                                     yend = max(intensity.data.l1$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                      line = list(color = 'black', width = 5),
                                                      name = 'Period 2 End',
                                                      showlegend = FALSE)
@@ -967,7 +962,7 @@ server <- function(input, output, session) {
                                         add_segments(x = as.Date(min(intensity.data.l1$per3.end.date, na.rm = TRUE)),
                                                      xend = as.Date(min(intensity.data.l1$per3.end.date, na.rm = TRUE)),
                                                      y = 0,
-                                                     yend = max(intensity.data.l1$mean.intensity, na.rm = TRUE) + 2000,
+                                                     yend = max(intensity.data.l1$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                      line = list(color = 'black', width = 5),
                                                      name = 'Period 3 End',
                                                      showlegend = FALSE)
@@ -1000,13 +995,13 @@ server <- function(input, output, session) {
                                                         by = "day")) %>%
                                 # create variable to show bars for missing days
                                 mutate(intensity.na = case_when(
-                                        is.na(mean.intensity) ~ max(mean.intensity, na.rm = TRUE) + 500
+                                        is.na(mean.intensity.lum_ft2) ~ max(mean.intensity.lum_ft2, na.rm = TRUE) + 500
                                 )
                                 )
                         temp.data.l1 <- tempFiltered() %>%
                                 filter(Site.L == "L1") %>%
                                 mutate(intensity.na = case_when(
-                                        is.na(Intensity) ~ max(Intensity, na.rm = TRUE) + 500
+                                        is.na(intensity.lum_ft2) ~ max(intensity.lum_ft2, na.rm = TRUE) + 500
                                 )
                                 )
 
@@ -1023,7 +1018,7 @@ server <- function(input, output, session) {
                         
                         p <- plot_ly(intensity.data.l1,
                                      x = ~as.Date(intensity.data.l1$day),
-                                     y = round(intensity.data.l1$mean.intensity, 1),
+                                     y = round(intensity.data.l1$mean.intensity.lum_ft2, 1),
                                      type = "bar",
                                      opacity = 0.7,
                                      hovertemplate = paste('(%{x}, %{y})', '<extra></extra>'),
@@ -1040,7 +1035,7 @@ server <- function(input, output, session) {
                                 ) %>%
                                 add_trace(
                                         x = ~as_datetime(intensity.data.l1$day),
-                                        y = intensity.data.l1$mean.temp,
+                                        y = intensity.data.l1$mean.temp.f,
                                         name = "Daily Temp. (F)",
                                         yaxis = "y2",
                                         type = "scatter",
@@ -1051,19 +1046,21 @@ server <- function(input, output, session) {
                                          name = "Missing Data", opacity = 0.6,
                                          hovertemplate = "", 
                                          marker = list(color = 'pink')) %>%
-                                add_segments(x = min(intensity.data.l1$day),
-                                             xend = max(intensity.data.l1$day),
-                                             y = intensity.data.l1$Cal.Intensity,
-                                             yend = intensity.data.l1$Cal.Intensity,
-                                             name = paste0("Calibration Intensity (", intensity.data.l1$Cal.Intensity,")"),
-                                             line = list(color = 'orange', width = 3))
+                                add_trace(
+                                        x = ~as_datetime(intensity.data.l1$day),
+                                        y = intensity.data.l1$cal.intensity.lum_ft2,
+                                        type = "scatter",
+                                        mode = "lines",
+                                        name = "Calibration Intensity",
+                                        line = list(color = 'orange', width = 3)
+                                )
                         
                         if(!is.na(max(intensity.data.l1$per1.start, na.rm = TRUE))){
                                 p <- p %>%
                                         add_segments(x = as.Date(min(intensity.data.l1$per1.start, na.rm = TRUE)),
                                                      xend = as.Date(min(intensity.data.l1$per1.start, na.rm = TRUE)),
                                                      y = 0,
-                                                     yend = max(intensity.data.l1$mean.intensity, na.rm = TRUE) + 2000,
+                                                     yend = max(intensity.data.l1$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                      line = list(color = 'black', width = 5),
                                                      name = 'Field Visit',
                                                      showlegend = FALSE)
@@ -1078,7 +1075,7 @@ server <- function(input, output, session) {
                                         add_segments(x = as.Date(min(intensity.data.l1$per1.end.date, na.rm = TRUE)),
                                                      xend = as.Date(min(intensity.data.l1$per1.end.date, na.rm = TRUE)),
                                                      y = 0,
-                                                     yend = max(intensity.data.l1$mean.intensity, na.rm = TRUE) + 2000,
+                                                     yend = max(intensity.data.l1$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                      line = list(color = 'black', width = 5),
                                                      name = 'Field Visit')
                                 
@@ -1091,7 +1088,7 @@ server <- function(input, output, session) {
                                         add_segments(x = as.Date(min(intensity.data.l1$per2.end.date, na.rm = TRUE)),
                                                      xend = as.Date(min(intensity.data.l1$per2.end.date, na.rm = TRUE)),
                                                      y = 0,
-                                                     yend = max(intensity.data.l1$mean.intensity, na.rm = TRUE) + 2000,
+                                                     yend = max(intensity.data.l1$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                      line = list(color = 'black', width = 5),
                                                      name = 'Period 2 End',
                                                      showlegend = FALSE)
@@ -1106,7 +1103,7 @@ server <- function(input, output, session) {
                                         add_segments(x = as.Date(min(intensity.data.l1$per3.end.date, na.rm = TRUE)),
                                                      xend = as.Date(min(intensity.data.l1$per3.end.date, na.rm = TRUE)),
                                                      y = 0,
-                                                     yend = max(intensity.data.l1$mean.intensity, na.rm = TRUE) + 2000,
+                                                     yend = max(intensity.data.l1$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                      line = list(color = 'black', width = 5),
                                                      name = 'Period 3 End',
                                                      showlegend = FALSE)
@@ -1141,7 +1138,7 @@ server <- function(input, output, session) {
                                                         by = "day")) %>%
                                 # create variable to show bars for missing days
                                 mutate(intensity.na = case_when(
-                                        is.na(mean.intensity) ~ max(mean.intensity, na.rm = TRUE) + 500
+                                        is.na(mean.intensity.lum_ft2) ~ max(mean.intensity.lum_ft2, na.rm = TRUE) + 500
                                         )
                                 )
                         
@@ -1160,7 +1157,7 @@ server <- function(input, output, session) {
                                 
                                 p <- plot_ly(intensity.data.l1,
                                              x = ~as.Date(intensity.data.l1$day),
-                                             y = round(intensity.data.l1$mean.intensity, 1),
+                                             y = round(intensity.data.l1$mean.intensity.lum_ft2, 1),
                                              type = "bar",
                                              opacity = 0.7,
                                              hovertemplate = paste('(%{x}, %{y})', '<extra></extra>'),
@@ -1189,19 +1186,21 @@ server <- function(input, output, session) {
                                                  name = "Missing Data", opacity = 0.6,
                                                  hovertemplate = "", 
                                                  marker = list(color = 'pink')) %>%
-                                        add_segments(x = min(intensity.data.l1$day),
-                                                     xend = max(intensity.data.l1$day),
-                                                     y = intensity.data.l1$Cal.Intensity,
-                                                     yend = intensity.data.l1$Cal.Intensity,
-                                                     name = paste0("Calibration Intensity (", intensity.data.l1$Cal.Intensity,")"),
-                                                     line = list(color = 'orange', width = 3))
+                                        add_trace(
+                                                x = ~as_datetime(intensity.data.l1$day),
+                                                y = intensity.data.l1$cal.intensity.lum_ft2,
+                                                type = "scatter",
+                                                mode = "lines",
+                                                name = "Calibration Intensity",
+                                                line = list(color = 'orange', width = 3)
+                                        )
                                 
                                 if(!is.na(max(intensity.data.l1$per1.start, na.rm = TRUE))){
                                         p <- p %>%
                                                 add_segments(x = as.Date(min(intensity.data.l1$per1.start, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l1$per1.start, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l1$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l1$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Field Visit',
                                                              showlegend = FALSE)
@@ -1216,7 +1215,7 @@ server <- function(input, output, session) {
                                                 add_segments(x = as.Date(min(intensity.data.l1$per1.end.date, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l1$per1.end.date, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l1$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l1$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Field Visit')
                                         
@@ -1229,7 +1228,7 @@ server <- function(input, output, session) {
                                                 add_segments(x = as.Date(min(intensity.data.l1$per2.end.date, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l1$per2.end.date, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l1$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l1$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Period 2 End',
                                                              showlegend = FALSE)
@@ -1244,7 +1243,7 @@ server <- function(input, output, session) {
                                                 add_segments(x = as.Date(min(intensity.data.l1$per3.end.date, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l1$per3.end.date, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l1$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l1$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Period 3 End',
                                                              showlegend = FALSE)
@@ -1279,13 +1278,13 @@ server <- function(input, output, session) {
                                                         by = "day")) %>%
                                 # create variable to show bars for missing days
                                 mutate(intensity.na = case_when(
-                                        is.na(mean.intensity) ~ max(mean.intensity, na.rm = TRUE) + 500
+                                        is.na(mean.intensity.lum_ft2) ~ max(mean.intensity.lum_ft2, na.rm = TRUE) + 500
                                         )
                                 )
                         temp.data.l1 <- tempFiltered() %>%
                                 filter(Site.L == "L1") %>%
                                 mutate(intensity.na = case_when(
-                                        is.na(Intensity) ~ max(Intensity, na.rm = TRUE) + 500
+                                        is.na(intensity.lum_ft2) ~ max(intensity.lum_ft2, na.rm = TRUE) + 500
                                         )
                                 )
                         
@@ -1302,7 +1301,7 @@ server <- function(input, output, session) {
                                 
                                 p <- plot_ly(temp.data.l1,
                                              x = ~as_datetime(temp.data.l1$DateFormat),
-                                             y = temp.data.l1$Intensity,
+                                             y = temp.data.l1$intensity.lum_ft2,
                                              type = "bar",
                                              opacity = 0.7,
                                              hovertemplate = paste('(%{x}, %{y})', '<extra></extra>'),
@@ -1327,19 +1326,21 @@ server <- function(input, output, session) {
                                                 mode = "lines",
                                                 line = list(color = "#c20c06")
                                         ) %>%
-                                        add_segments(x = min(temp.data.l1$DateFormat),
-                                                     xend = max(temp.data.l1$DateFormat),
-                                                     y = intensity.data.l1$Cal.Intensity,
-                                                     yend = intensity.data.l1$Cal.Intensity,
-                                                     name = paste0("Calibration Intensity (", intensity.data.l1$Cal.Intensity,")"),
-                                                     line = list(color = 'orange', width = 3))
+                                        add_trace(
+                                                x = ~as_datetime(intensity.data.l1$day),
+                                                y = intensity.data.l1$cal.intensity.lum_ft2,
+                                                type = "scatter",
+                                                mode = "lines",
+                                                name = "Calibration Intensity",
+                                                line = list(color = 'orange', width = 3)
+                                        )
                                 
                                 if(!is.na(max(intensity.data.l1$per1.start, na.rm = TRUE))){
                                         p <- p %>%
                                                 add_segments(x = as.Date(min(intensity.data.l1$per1.start, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l1$per1.start, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l1$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l1$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Field Visit',
                                                              showlegend = FALSE)
@@ -1354,7 +1355,7 @@ server <- function(input, output, session) {
                                                 add_segments(x = as.Date(min(intensity.data.l1$per1.end.date, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l1$per1.end.date, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l1$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l1$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Field Visit')
                                         
@@ -1367,7 +1368,7 @@ server <- function(input, output, session) {
                                                 add_segments(x = as.Date(min(intensity.data.l1$per2.end.date, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l1$per2.end.date, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l1$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l1$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Period 2 End',
                                                              showlegend = FALSE)
@@ -1382,7 +1383,7 @@ server <- function(input, output, session) {
                                                 add_segments(x = as.Date(min(intensity.data.l1$per3.end.date, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l1$per3.end.date, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l1$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l1$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Period 3 End',
                                                              showlegend = FALSE)
@@ -1417,13 +1418,13 @@ server <- function(input, output, session) {
                                                                 by = "day")) %>%
                                         # create variable to show bars for missing days
                                         mutate(intensity.na = case_when(
-                                                is.na(mean.intensity) ~ max(mean.intensity, na.rm = TRUE) + 500
+                                                is.na(mean.intensity.lum_ft2) ~ max(mean.intensity.lum_ft2, na.rm = TRUE) + 500
                                         )
                                         )
                                 
                                 p <- plot_ly(intensity.data.l1,
                                              x = ~as.Date(intensity.data.l1$day),
-                                             y = round(intensity.data.l1$mean.intensity, 1),
+                                             y = round(intensity.data.l1$mean.intensity.lum_ft2, 1),
                                              type = "bar",
                                              opacity = 0.7,
                                              hovertemplate = paste('(%{x}, %{y})', '<extra></extra>'),
@@ -1441,19 +1442,21 @@ server <- function(input, output, session) {
                                                  name = "Missing Data", opacity = 0.6,
                                                  hovertemplate = "", 
                                                  marker = list(color = 'pink')) %>%
-                                        add_segments(x = min(intensity.data.l1$day),
-                                                     xend = max(intensity.data.l1$day),
-                                                     y = intensity.data.l1$Cal.Intensity,
-                                                     yend = intensity.data.l1$Cal.Intensity,
-                                                     name = paste0("Calibration Intensity (", intensity.data.l1$Cal.Intensity,")"),
-                                                     line = list(color = 'orange', width = 3))
+                                        add_trace(
+                                                x = ~as_datetime(intensity.data.l1$day),
+                                                y = intensity.data.l1$cal.intensity.lum_ft2,
+                                                type = "scatter",
+                                                mode = "lines",
+                                                name = "Calibration Intensity",
+                                                line = list(color = 'orange', width = 3)
+                                        )
                                 
                                 if(!is.na(max(intensity.data.l1$per1.start, na.rm = TRUE))){
                                         p <- p %>%
                                                 add_segments(x = as.Date(min(intensity.data.l1$per1.start, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l1$per1.start, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l1$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l1$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Field Visit',
                                                              showlegend = FALSE)
@@ -1468,7 +1471,7 @@ server <- function(input, output, session) {
                                                 add_segments(x = as.Date(min(intensity.data.l1$per1.end.date, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l1$per1.end.date, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l1$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l1$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Field Visit')
                                 } else {
@@ -1480,7 +1483,7 @@ server <- function(input, output, session) {
                                                 add_segments(x = as.Date(min(intensity.data.l1$per2.end.date, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l1$per2.end.date, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l1$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l1$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Period 2 End',
                                                              showlegend = FALSE)
@@ -1495,7 +1498,7 @@ server <- function(input, output, session) {
                                                 add_segments(x = as.Date(min(intensity.data.l1$per3.end.date, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l1$per3.end.date, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l1$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l1$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Period 3 End',
                                                              showlegend = FALSE)
@@ -1516,7 +1519,7 @@ server <- function(input, output, session) {
 
                         p <- plot_ly(intensity.data.l2,
                                      x = ~as.Date(intensity.data.l2$day),
-                                     y = round(intensity.data.l2$mean.intensity, 1),
+                                     y = round(intensity.data.l2$mean.intensity.lum_ft2, 1),
                                      type = "bar",
                                      opacity = 0.7,
                                      hovertemplate = paste('(%{x}, %{y})', '<extra></extra>'),
@@ -1531,24 +1534,26 @@ server <- function(input, output, session) {
                                         plot_bgcolor = "#e5ecf6",
                                         bargap = 0,
                                         dragmode='pan'
-                                ) %>%
-                        add_bars(y = intensity.data.l2$intensity.na, 
-                                 name = "Missing Data", opacity = 0.6,
-                                 hovertemplate = "", 
-                                 marker = list(color = 'pink')) %>%
-                                add_segments(x = min(intensity.data.l2$day),
-                                             xend = max(intensity.data.l2$day),
-                                             y = intensity.data.l2$Cal.Intensity,
-                                             yend = intensity.data.l2$Cal.Intensity,
-                                             name = paste0("Calibration Intensity (", intensity.data.l2$Cal.Intensity,")"),
-                                             line = list(color = 'orange', width = 3))
+                                        ) %>%
+                                add_bars(y = intensity.data.l2$intensity.na, 
+                                         name = "Missing Data", opacity = 0.6,
+                                         hovertemplate = "", 
+                                         marker = list(color = 'pink')) %>%
+                                add_trace(
+                                        x = ~as_datetime(intensity.data.l2$day),
+                                        y = intensity.data.l2$cal.intensity.lum_ft2,
+                                        type = "scatter",
+                                        mode = "lines",
+                                        name = "Calibration Intensity",
+                                        line = list(color = 'orange', width = 3)
+                                )
                         
                         if(!is.na(max(intensity.data.l2$per1.start, na.rm = TRUE))){
                                 p <- p %>%
                                         add_segments(x = as.Date(min(intensity.data.l2$per1.start, na.rm = TRUE)),
                                                      xend = as.Date(min(intensity.data.l2$per1.start, na.rm = TRUE)),
                                                      y = 0,
-                                                     yend = max(intensity.data.l2$mean.intensity, na.rm = TRUE) + 2000,
+                                                     yend = max(intensity.data.l2$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                      line = list(color = 'black', width = 5),
                                                      name = 'Field Visit',
                                                      showlegend = FALSE)
@@ -1563,7 +1568,7 @@ server <- function(input, output, session) {
                                         add_segments(x = as.Date(min(intensity.data.l2$per1.end.date, na.rm = TRUE)),
                                                      xend = as.Date(min(intensity.data.l2$per1.end.date, na.rm = TRUE)),
                                                      y = 0,
-                                                     yend = max(intensity.data.l2$mean.intensity, na.rm = TRUE) + 2000,
+                                                     yend = max(intensity.data.l2$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                      line = list(color = 'black', width = 5),
                                                      name = 'Field Visit')
                         } else {
@@ -1575,7 +1580,7 @@ server <- function(input, output, session) {
                                         add_segments(x = as.Date(min(intensity.data.l2$per2.end.date, na.rm = TRUE)),
                                                      xend = as.Date(min(intensity.data.l2$per2.end.date, na.rm = TRUE)),
                                                      y = 0,
-                                                     yend = max(intensity.data.l2$mean.intensity, na.rm = TRUE) + 2000,
+                                                     yend = max(intensity.data.l2$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                      line = list(color = 'black', width = 5),
                                                      name = 'Period 2 End',
                                                      showlegend = FALSE)
@@ -1590,7 +1595,7 @@ server <- function(input, output, session) {
                                         add_segments(x = as.Date(min(intensity.data.l2$per3.end.date, na.rm = TRUE)),
                                                      xend = as.Date(min(intensity.data.l2$per3.end.date, na.rm = TRUE)),
                                                      y = 0,
-                                                     yend = max(intensity.data.l2$mean.intensity, na.rm = TRUE) + 2000,
+                                                     yend = max(intensity.data.l2$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                      line = list(color = 'black', width = 5),
                                                      name = 'Period 3 End',
                                                      showlegend = FALSE)
@@ -1626,7 +1631,7 @@ server <- function(input, output, session) {
                                                                 by = "day")) %>%
                                         # create variable to show bars for missing days
                                         mutate(intensity.na = case_when(
-                                                is.na(mean.intensity) ~ max(mean.intensity, na.rm = TRUE) + 500
+                                                is.na(mean.intensity.lum_ft2) ~ max(mean.intensity.lum_ft2, na.rm = TRUE) + 500
                                                 )
                                         )
                         }
@@ -1645,7 +1650,7 @@ server <- function(input, output, session) {
                                 
                                 p <- plot_ly(intensity.data.l2,
                                              x = ~as.Date(intensity.data.l2$day),
-                                             y = round(intensity.data.l2$mean.intensity, 1),
+                                             y = round(intensity.data.l2$mean.intensity.lum_ft2, 1),
                                              type = "bar",
                                              opacity = 0.7,
                                              hovertemplate = paste('(%{x}, %{y})', '<extra></extra>'),
@@ -1663,7 +1668,7 @@ server <- function(input, output, session) {
                                         ) %>%
                                         add_trace(
                                                 x = ~as.Date(intensity.data.l2$day),
-                                                y = intensity.data.l2$mean.temp,
+                                                y = intensity.data.l2$mean.temp.f,
                                                 name = "Daily Temp. (F)",
                                                 yaxis = "y2",
                                                 type = "scatter",
@@ -1674,19 +1679,21 @@ server <- function(input, output, session) {
                                                  name = "Missing Data", opacity = 0.6,
                                                  hovertemplate = "", 
                                                  marker = list(color = 'pink')) %>%
-                                        add_segments(x = min(intensity.data.l2$day),
-                                                     xend = max(intensity.data.l2$day),
-                                                     y = intensity.data.l2$Cal.Intensity,
-                                                     yend = intensity.data.l2$Cal.Intensity,
-                                                     name = paste0("Calibration Intensity (", intensity.data.l2$Cal.Intensity,")"),
-                                                     line = list(color = 'orange', width = 3))
+                                        add_trace(
+                                                x = ~as_datetime(intensity.data.l2$day),
+                                                y = intensity.data.l2$cal.intensity.lum_ft2,
+                                                type = "scatter",
+                                                mode = "lines",
+                                                name = "Calibration Intensity",
+                                                line = list(color = 'orange', width = 3)
+                                        )
                                 
                                 if(!is.na(max(intensity.data.l2$per1.start, na.rm = TRUE))){
                                         p <- p %>%
                                                 add_segments(x = as.Date(min(intensity.data.l2$per1.start, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l2$per1.start, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l2$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l2$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Field Visit',
                                                              showlegend = FALSE)
@@ -1701,7 +1708,7 @@ server <- function(input, output, session) {
                                                 add_segments(x = as.Date(min(intensity.data.l2$per1.end.date, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l2$per1.end.date, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l2$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l2$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Field Visit')
                                         
@@ -1714,7 +1721,7 @@ server <- function(input, output, session) {
                                                 add_segments(x = as.Date(min(intensity.data.l2$per2.end.date, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l2$per2.end.date, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l2$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l2$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Period 2 End',
                                                              showlegend = FALSE)
@@ -1729,7 +1736,7 @@ server <- function(input, output, session) {
                                                 add_segments(x = as.Date(min(intensity.data.l2$per3.end.date, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l2$per3.end.date, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l2$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l2$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Period 3 End',
                                                              showlegend = FALSE)
@@ -1765,7 +1772,7 @@ server <- function(input, output, session) {
                                                                 by = "day")) %>%
                                         # create variable to show bars for missing days
                                         mutate(intensity.na = case_when(
-                                                is.na(mean.intensity) ~ max(mean.intensity, na.rm = TRUE) + 500
+                                                is.na(mean.intensity.lum_ft2) ~ max(mean.intensity.lum_ft2, na.rm = TRUE) + 500
                                                 )
                                         )
                         }
@@ -1782,7 +1789,7 @@ server <- function(input, output, session) {
 
                                 p <- plot_ly(intensity.data.l2,
                                              x = ~as.Date(intensity.data.l2$day),
-                                             y = round(intensity.data.l2$mean.intensity, 1),
+                                             y = round(intensity.data.l2$mean.intensity.lum_ft2, 1),
                                              type = "bar",
                                              opacity = 0.7,
                                              hovertemplate = paste('(%{x}, %{y})', '<extra></extra>'),
@@ -1811,19 +1818,21 @@ server <- function(input, output, session) {
                                                  name = "Missing Data", opacity = 0.6,
                                                  hovertemplate = "", 
                                                  marker = list(color = 'pink')) %>%
-                                        add_segments(x = min(intensity.data.l2$day),
-                                                     xend = max(intensity.data.l2$day),
-                                                     y = intensity.data.l2$Cal.Intensity,
-                                                     yend = intensity.data.l2$Cal.Intensity,
-                                                     name = paste0("Calibration Intensity (", intensity.data.l2$Cal.Intensity,")"),
-                                                     line = list(color = 'orange', width = 3))
+                                        add_trace(
+                                                x = ~as_datetime(intensity.data.l2$day),
+                                                y = intensity.data.l2$cal.intensity.lum_ft2,
+                                                type = "scatter",
+                                                mode = "lines",
+                                                name = "Calibration Intensity",
+                                                line = list(color = 'orange', width = 3)
+                                        )
                                 
                                 if(!is.na(max(intensity.data.l2$per1.start, na.rm = TRUE))){
                                         p <- p %>%
                                                 add_segments(x = as.Date(min(intensity.data.l2$per1.start, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l2$per1.start, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l2$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l2$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Field Visit',
                                                              showlegend = FALSE)
@@ -1838,7 +1847,7 @@ server <- function(input, output, session) {
                                                 add_segments(x = as.Date(min(intensity.data.l2$per1.end.date, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l2$per1.end.date, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l2$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l2$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Field Visit')
                                         
@@ -1851,7 +1860,7 @@ server <- function(input, output, session) {
                                                 add_segments(x = as.Date(min(intensity.data.l2$per2.end.date, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l2$per2.end.date, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l2$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l2$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Period 2 End',
                                                              showlegend = FALSE)
@@ -1866,7 +1875,7 @@ server <- function(input, output, session) {
                                                 add_segments(x = as.Date(min(intensity.data.l2$per3.end.date, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l2$per3.end.date, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l2$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l2$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Period 3 End',
                                                              showlegend = FALSE)
@@ -1902,7 +1911,7 @@ server <- function(input, output, session) {
                                                                 by = "day")) %>%
                                         # create variable to show bars for missing days
                                         mutate(intensity.na = case_when(
-                                                is.na(mean.intensity) ~ max(mean.intensity, na.rm = TRUE) + 500
+                                                is.na(mean.intensity.lum_ft2) ~ max(mean.intensity.lum_ft2, na.rm = TRUE) + 500
                                         )
                                         )
                         }
@@ -1911,7 +1920,7 @@ server <- function(input, output, session) {
                                 temp.data.l2 <- tempFiltered() %>%
                                         filter(Site.L == "L2") %>%
                                         mutate(intensity.na = case_when(
-                                                is.na(Intensity) ~ max(Intensity, na.rm = TRUE) + 500
+                                                is.na(intensity.lum_ft2) ~ max(intensity.lum_ft2, na.rm = TRUE) + 500
                                                 )
                                         )
                         }
@@ -1928,7 +1937,7 @@ server <- function(input, output, session) {
                                 
                                 p <- plot_ly(temp.data.l2,
                                              x = ~as_datetime(temp.data.l2$DateFormat),
-                                             y = temp.data.l2$Intensity,
+                                             y = temp.data.l2$intensity.lum_ft2,
                                              type = "bar",
                                              opacity = 0.7,
                                              hovertemplate = paste('(%{x}, %{y})', '<extra></extra>'),
@@ -1953,19 +1962,21 @@ server <- function(input, output, session) {
                                                 line = list(color = "#c20c06")
                                         ) %>%
 
-                                add_segments(x = min(temp.data.l2$DateFormat),
-                                             xend = max(temp.data.l2$DateFormat),
-                                             y = intensity.data.l2$Cal.Intensity,
-                                             yend = intensity.data.l2$Cal.Intensity,
-                                             name = paste0("Calibration Intensity (", intensity.data.l2$Cal.Intensity,")"),
-                                             line = list(color = 'orange', width = 3))
+                                        add_trace(
+                                                x = ~as_datetime(intensity.data.l2$day),
+                                                y = intensity.data.l2$cal.intensity.lum_ft2,
+                                                type = "scatter",
+                                                mode = "lines",
+                                                name = "Calibration Intensity",
+                                                line = list(color = 'orange', width = 3)
+                                        )
                                 
                                 if(!is.na(max(intensity.data.l2$per1.start, na.rm = TRUE))){
                                         p <- p %>%
                                                 add_segments(x = as.Date(min(intensity.data.l2$per1.start, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l2$per1.start, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l2$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l2$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Field Visit',
                                                              showlegend = FALSE)
@@ -1980,7 +1991,7 @@ server <- function(input, output, session) {
                                                 add_segments(x = as.Date(min(intensity.data.l2$per1.end.date, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l2$per1.end.date, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l2$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l2$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Field Visit')
                                         
@@ -1993,7 +2004,7 @@ server <- function(input, output, session) {
                                                 add_segments(x = as.Date(min(intensity.data.l2$per2.end.date, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l2$per2.end.date, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l2$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l2$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Period 2 End',
                                                              showlegend = FALSE)
@@ -2008,7 +2019,7 @@ server <- function(input, output, session) {
                                                 add_segments(x = as.Date(min(intensity.data.l2$per3.end.date, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l2$per3.end.date, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l2$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l2$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Period 3 End',
                                                              showlegend = FALSE)
@@ -2044,7 +2055,7 @@ server <- function(input, output, session) {
                                                                 by = "day")) %>%
                                         # create variable to show bars for missing days
                                         mutate(intensity.na = case_when(
-                                                is.na(mean.intensity) ~ max(mean.intensity, na.rm = TRUE) + 500
+                                                is.na(mean.intensity.lum_ft2) ~ max(mean.intensity.lum_ft2, na.rm = TRUE) + 500
                                                 )
                                         )
                         }
@@ -2053,7 +2064,7 @@ server <- function(input, output, session) {
 
                                 p <- plot_ly(intensity.data.l2,
                                              x = ~as.Date(intensity.data.l2$day),
-                                             y = round(intensity.data.l2$mean.intensity, 1),
+                                             y = round(intensity.data.l2$mean.intensity.lum_ft2, 1),
                                              type = "bar",
                                              opacity = 0.7,
                                              hovertemplate = paste('(%{x}, %{y})', '<extra></extra>'),
@@ -2067,23 +2078,21 @@ server <- function(input, output, session) {
                                                 bargap = 0,
                                                 dragmode='pan'
                                         ) %>%
-                                add_bars(y = intensity.data.l2$intensity.na, 
-                                         name = "Missing Data", opacity = 0.6,
-                                         hovertemplate = "", 
-                                         marker = list(color = 'pink')) %>%
-                                        add_segments(x = min(intensity.data.l2$day),
-                                                     xend = max(intensity.data.l2$day),
-                                                     y = intensity.data.l2$Cal.Intensity,
-                                                     yend = intensity.data.l2$Cal.Intensity,
-                                                     name = paste0("Calibration Intensity (", intensity.data.l2$Cal.Intensity,")"),
-                                                     line = list(color = 'orange', width = 3))
+                                        add_trace(
+                                                x = ~as_datetime(intensity.data.l2$day),
+                                                y = intensity.data.l2$cal.intensity.lum_ft2,
+                                                type = "scatter",
+                                                mode = "lines",
+                                                name = "Calibration Intensity",
+                                                line = list(color = 'orange', width = 3)
+                                        )
                                 
                                 if(!is.na(max(intensity.data.l2$per1.start, na.rm = TRUE))){
                                         p <- p %>%
                                                 add_segments(x = as.Date(min(intensity.data.l2$per1.start, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l2$per1.start, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l2$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l2$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Field Visit',
                                                              showlegend = FALSE)
@@ -2098,7 +2107,7 @@ server <- function(input, output, session) {
                                                 add_segments(x = as.Date(min(intensity.data.l2$per1.end.date, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l2$per1.end.date, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l2$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l2$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Field Visit')
                                         
@@ -2111,7 +2120,7 @@ server <- function(input, output, session) {
                                                 add_segments(x = as.Date(min(intensity.data.l2$per2.end.date, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l2$per2.end.date, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l2$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l2$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Period 2 End',
                                                              showlegend = FALSE)
@@ -2126,7 +2135,7 @@ server <- function(input, output, session) {
                                                 add_segments(x = as.Date(min(intensity.data.l2$per3.end.date, na.rm = TRUE)),
                                                              xend = as.Date(min(intensity.data.l2$per3.end.date, na.rm = TRUE)),
                                                              y = 0,
-                                                             yend = max(intensity.data.l2$mean.intensity, na.rm = TRUE) + 2000,
+                                                             yend = max(intensity.data.l2$mean.intensity.lum_ft2, na.rm = TRUE) + 2000,
                                                              line = list(color = 'black', width = 5),
                                                              name = 'Period 3 End',
                                                              showlegend = FALSE)
@@ -2152,7 +2161,8 @@ server <- function(input, output, session) {
                                        rec.end.date = case_when(
                                                is.na(rec.end.date) ~ max(day),
                                                TRUE ~ rec.end.date
-                                       )
+                                       ),
+                                       intensity.diff = mean.intensity.lum_ft2 - cal.intensity.lum_ft2
                                 ) %>%
                                 # fill in missing days
                                 complete(day = seq.Date(as.Date(rec.start.date[1]), 
@@ -2160,7 +2170,7 @@ server <- function(input, output, session) {
                                                         by = "day")) %>%
                                 # create variable to show bars for missing days
                                 mutate(intensity.na = case_when(
-                                        is.na(mean.intensity) ~ max(mean.intensity, na.rm = TRUE) + 500
+                                        is.na(mean.intensity.lum_ft2) ~ max(mean.intensity.lum_ft2, na.rm = TRUE) + 500
                                         )
                                 )
 
@@ -2173,7 +2183,8 @@ server <- function(input, output, session) {
                                                rec.end.date = case_when(
                                                        is.na(rec.end.date) ~ max(day),
                                                        TRUE ~ rec.end.date
-                                               )
+                                               ),
+                                               intensity.diff = mean.intensity.lum_ft2 - cal.intensity.lum_ft2
                                         ) %>%
                                         # fill in missing days
                                         complete(day = seq.Date(as.Date(rec.start.date[1]), 
@@ -2181,7 +2192,7 @@ server <- function(input, output, session) {
                                                                 by = "day")) %>%
                                         # create variable to show bars for missing days
                                         mutate(intensity.na = case_when(
-                                                is.na(mean.intensity) ~ max(mean.intensity, na.rm = TRUE) + 500
+                                                is.na(mean.intensity.lum_ft2) ~ max(mean.intensity.lum_ft2, na.rm = TRUE) + 500
                                                 )
                                         )
                         }
@@ -2195,19 +2206,31 @@ server <- function(input, output, session) {
                                        plot_bgcolor = "#e5ecf6",
                                        bargap = 0,
                                        dragmode='pan') %>%
-                                add_segments(x = min(intensity.data.l2$day),
-                                             xend = max(intensity.data.l2$day),
-                                             y = intensity.data.l2$Cal.Intensity,
-                                             yend = intensity.data.l2$Cal.Intensity,
-                                             name = paste0("L2 Calibration Intensity (", intensity.data.l2$Cal.Intensity,")")) %>%
+                                add_trace(
+                                        x = ~as_datetime(intensity.data.l1$day),
+                                        y = intensity.data.l1$cal.intensity.lum_ft2,
+                                        type = "scatter",
+                                        mode = "lines",
+                                        name = "L1 Calibration Intensity",
+                                        line = list(color = 'orange', width = 3)
+                                ) %>%
+                                add_trace(
+                                        x = ~as_datetime(intensity.data.l2$day),
+                                        y = intensity.data.l2$cal.intensity.lum_ft2,
+                                        type = "scatter",
+                                        mode = "lines",
+                                        name = "L2 Calibration Intensity",
+                                        line = list(color = 'purple', width = 3)
+                                ) %>%
                                 add_bars(x = ~as.Date(intensity.data.l1$day),
-                                         y = round(intensity.data.l1$mean.intensity, 1), 
+                                         y = round(intensity.data.l1$mean.intensity.lum_ft2, 1), 
                                          name = "Site L1 Data", opacity = 1,
                                          color = I("light blue")) %>%
                                 add_bars(x = ~as.Date(intensity.data.l2$day),
-                                         y = round(intensity.data.l2$mean.intensity, 1), 
+                                         y = round(intensity.data.l2$mean.intensity.lum_ft2, 1), 
                                          name = "Site L2 Data", opacity = 0.4,
                                          marker = list(color = 'green'))
+                        
         
                 }) # End render plotly
 

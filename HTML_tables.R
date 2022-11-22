@@ -85,7 +85,7 @@ build_table3 <- function(data){
                            ),
                            tags$tr(style = "background: #d2d4d2",
                                    tags$th("Water Depth (cm)", style = 'padding-left: 3px'),
-                                   tags$td(data$water_depth)
+                                   tags$td(data$water_depth_cm)
                            ),
                            tags$tr(
                                    tags$th("Hydrologic Condition", style = 'padding-left: 3px'),
@@ -123,7 +123,7 @@ build_table4 <- function(data){
                            ),
                            tags$tr(style = "background: #d2d4d2",
                                    tags$th("Water Depth (cm)", style = 'padding-left: 3px'),
-                                   tags$td(data$water_depth)
+                                   tags$td(data$water_depth_cm)
                            ),
                            tags$tr(
                                    tags$th("Hydrologic Condition", style = 'padding-left: 3px'),
@@ -161,7 +161,7 @@ build_table5 <- function(data){
                            ),
                            tags$tr(style = "background: #d2d4d2",
                                    tags$th("Water Depth (cm)", style = 'padding-left: 3px'),
-                                   tags$td(data$water_depth)
+                                   tags$td(data$water_depth_cm)
                            ),
                            tags$tr(
                                    tags$th("Hydrologic Condition", style = 'padding-left: 3px'),
@@ -199,7 +199,7 @@ build_table6 <- function(data){
                            ),
                            tags$tr(style = "background: #d2d4d2",
                                    tags$th("Water Depth (cm)", style = 'padding-left: 3px'),
-                                   tags$td(data$water_depth)
+                                   tags$td(data$water_depth_cm)
                            ),
                            tags$tr(
                                    tags$th("Hydrologic Condition", style = 'padding-left: 3px'),
