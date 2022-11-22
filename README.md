@@ -19,8 +19,11 @@ There are four CSV files containing the data used by the application.
 
 ### Getting Started
 The steps below outline the process of setting up the example dashboard.
-* Download the code files and the data files listed in the Code section and Data section.
-* Set up a new project folder on your local machine and add the downloaded files so that the project folder mimics the layout below:
+* Background Steps: If R and RStudio are not installed on the computer, please follow these steps:
+	* [Download R] (https://www.r-project.org/) and install.
+	* [Download RStudio] (https://posit.co/) and install. R should be installed before RStudio.
+* Step 1: [Click here] (https://github.com/USEPA/stream-intermittency-visualization-dashboard/archive/refs/heads/main.zip) to download the code files and the data files listed in the Code section and Data section.
+* Step 2: Extract the downloaded file into a new project folder on your local machine. The folder should have the same structure as provided below.
 
 ``` bash
 ├─ SIVD_project_folder
@@ -32,7 +35,10 @@ The steps below outline the process of setting up the example dashboard.
 │     ├─ GP_P1-3_summary_2022-03-16.csv
 │     └─ S123_field_data_2022-03-15.csv
 ```
-* The SIVD_main.R file can be opened and run in RStudio after the project folder has been set up.  
+* Step 3: Open RStudio -> File -> New Project... -> Existing Directory -> Navigate to your project folder from Step 2 and select the actual folder as your directory.
+* Step 4: File -> Open File... -> SIVD_main.R
+* Step 5: Click the "Run App" button at top, right-hand side of the code window to run the Shiny app.  A new window will open up with the app hosted locally.  If this is the first time running the app, you may be prompted to install the libraries utilized by the app.  This could take several minutes to complete.
+
 
 ### Dashboard Description
 1)	The Stream Intermittency Visualization dashboard runs off four tabs. Visualization Splash Board tab. This is the main visualization page for viewing multiple forms of data for a single site. To get started select one or more state(s) from the drop-down state menu. Using your mouse, you can adjust or keyboard to directly enter the minimum days to filter sites having a minimum number of days on record. Select a site from drop-down site code menu and the plots and data summaries for the selected site code will appear on the visualization splash board. The splash board includes high frequency logger and precipitation data, a pie chart of data record completeness for the logger data, aerial imagery of the site, and three tables that summarize logger data (Site Summary Metrics), data quality and field observations. For sites have duplicate data loggers the user can view plots from each logger separately (L1 or L2) or data from both loggers simultaneously (L1 & L2). With the daily mean intensity data the user can select overlaying daily total precipitation or daily mean temperature or select viewing hourly logger intensity and temperature data. Various tools are available for the user to capture image, zoom, pan, and identify specific values on plots.

@@ -1,0 +1,322 @@
+"Package","Version","Priority","Depends"
+"abind","1.4-5",NA,"R (>= 1.5.0)"
+"anytime","0.3.9",NA,"R (>= 3.2.0)"
+"askpass","1.1",NA,NA
+"assertthat","0.2.1",NA,NA
+"automap","1.0-16",NA,"R (>= 2.10.0), sp (>= 0.9-55)"
+"backports","1.4.1",NA,"R (>= 3.0.0)"
+"base64enc","0.1-3",NA,"R (>= 2.9.0)"
+"BH","1.78.0-0",NA,NA
+"bit","4.0.4",NA,"R (>= 2.9.2)"
+"bit64","4.0.5",NA,"R (>= 3.0.1), bit (>= 4.0.0), utils, methods, stats"
+"bitops","1.0-7",NA,NA
+"blob","1.2.3",NA,NA
+"brio","1.1.3",NA,NA
+"broom","1.0.1",NA,"R (>= 3.1)"
+"bs4Dash","2.1.0",NA,NA
+"bslib","0.4.0",NA,"R (>= 2.10)"
+"cachem","1.0.6",NA,NA
+"callr","3.7.2",NA,"R (>= 3.4)"
+"caret","6.0-93",NA,"ggplot2, lattice (>= 0.20), R (>= 3.2.0)"
+"caTools","1.18.2",NA,"R (>= 3.6.0)"
+"cellranger","1.1.0",NA,"R (>= 3.0.0)"
+"checkmate","2.1.0",NA,"R (>= 3.0.0)"
+"classInt","0.4-8",NA,"R (>= 2.2)"
+"cli","3.4.1",NA,"R (>= 3.4)"
+"clipr","0.8.0",NA,NA
+"clue","0.3-62",NA,"R (>= 3.2.0)"
+"colorspace","2.0-3",NA,"R (>= 3.0.0), methods"
+"colourpicker","1.2.0",NA,"R (>= 3.1.0)"
+"combinat","0.0-8",NA,NA
+"commonmark","1.8.1",NA,NA
+"condMVNorm","2020.1",NA,"R(>= 3.0), mvtnorm"
+"conf.design","2.0.0",NA,NA
+"corpcor","1.6.10",NA,"R (>= 3.0.2)"
+"covr","3.6.1",NA,"R (>= 3.1.0), methods"
+"cpp11","0.4.3",NA,NA
+"crayon","1.5.2",NA,NA
+"crosstalk","1.2.0",NA,NA
+"curl","4.3.3",NA,"R (>= 3.0.0)"
+"data.table","1.14.4",NA,"R (>= 3.1.0)"
+"DBI","1.1.3",NA,"methods, R (>= 3.0.0)"
+"dbplyr","2.2.1",NA,"R (>= 3.1)"
+"deldir","1.0-6",NA,"R (>= 3.5.0)"
+"desc","1.4.2",NA,"R (>= 3.4)"
+"DiceDesign","1.9",NA,"R (>= 2.10)"
+"DiceKriging","1.6.0",NA,"methods"
+"diffobj","0.3.5",NA,"R (>= 3.1.0)"
+"digest","0.6.30",NA,"R (>= 3.3.0)"
+"DoE.base","1.2-1",NA,"R (>= 2.10), grid, conf.design"
+"doParallel","1.0.17",NA,"R (>= 2.14.0), foreach (>= 1.2.0), iterators (>= 1.0.0),
+parallel, utils"
+"dplyr","1.0.10",NA,"R (>= 3.4.0)"
+"DT","0.26",NA,NA
+"dtplyr","1.2.2",NA,"R (>= 3.3)"
+"dtw","1.23-1",NA,"R (>= 2.10.0), proxy"
+"dtwclust","5.5.11",NA,"R (>= 3.3.0), methods, proxy (>= 0.4-16), dtw"
+"e1071","1.7-11",NA,NA
+"ellipsis","0.3.2",NA,"R (>= 3.2)"
+"evaluate","0.17",NA,"R (>= 3.0.2)"
+"evd","2.3-6.1",NA,NA
+"excelR","0.4.0",NA,NA
+"fansi","1.0.3",NA,"R (>= 3.1.0)"
+"farver","2.1.1",NA,NA
+"fastmap","1.1.0",NA,NA
+"flexclust","1.4-1",NA,"R (>= 2.14.0), graphics, grid, lattice, modeltools"
+"FNN","1.1.3.1",NA,"R (>= 3.0.0)"
+"fontawesome","0.3.0",NA,"R (>= 3.3.0)"
+"forcats","0.5.2",NA,"R (>= 3.4)"
+"foreach","1.5.2",NA,"R (>= 2.5.0)"
+"Formula","1.2-4",NA,"R (>= 2.0.0), stats"
+"fresh","0.2.0",NA,NA
+"fs","1.5.2",NA,"R (>= 3.1)"
+"future","1.28.0",NA,NA
+"future.apply","1.9.1",NA,"R (>= 3.2.0), future (>= 1.27.0)"
+"gargle","1.2.1",NA,"R (>= 3.5)"
+"generics","0.1.3",NA,"R (>= 3.2)"
+"geojsonsf","2.0.3",NA,"R (>= 3.3.0)"
+"geometries","0.2.0",NA,NA
+"ggExtra","0.10.0",NA,"R (>= 3.1.0)"
+"ggplot2","3.3.6",NA,"R (>= 3.3)"
+"ggrepel","0.9.1",NA,"R (>= 3.0.0), ggplot2 (>= 2.2.0)"
+"globals","0.16.1",NA,"R (>= 3.1.2)"
+"glue","1.6.2",NA,"R (>= 3.4)"
+"gmp","0.6-7",NA,"R (>= 3.5.0)"
+"googledrive","2.0.0",NA,"R (>= 3.3)"
+"googlesheets4","1.0.1",NA,"R (>= 3.4)"
+"gower","1.0.0",NA,NA
+"gplots","3.1.3",NA,"R (>= 3.0)"
+"gridExtra","2.3",NA,NA
+"gstat","2.1-0",NA,"R (>= 2.10)"
+"gtable","0.3.1",NA,"R (>= 3.0)"
+"gtools","3.9.3",NA,"methods, stats, utils"
+"hardhat","1.2.0",NA,"R (>= 3.4.0)"
+"haven","2.5.1",NA,"R (>= 3.4)"
+"highr","0.9",NA,"R (>= 3.2.3)"
+"Hmisc","4.7-1",NA,"lattice, survival (>= 3.1-6), Formula, ggplot2 (>= 2.2)"
+"hms","1.1.2",NA,NA
+"htmlTable","2.4.1",NA,NA
+"htmltools","0.5.3",NA,"R (>= 2.14.1)"
+"htmlwidgets","1.5.4",NA,NA
+"httpuv","1.6.6",NA,"R (>= 2.15.1)"
+"httr","1.4.4",NA,"R (>= 3.2)"
+"hydroGOF","0.4-0",NA,"R (>= 2.10.0), zoo (>= 1.7-2)"
+"hydroPSO","0.5-1",NA,"R (>= 3.6.0)"
+"hydroTSM","0.6-0",NA,"R (>= 2.10.0), zoo (>= 1.7-2), xts (>= 0.9-7)"
+"ids","1.0.1",NA,NA
+"igraph","1.3.5",NA,"methods"
+"IncDTW","1.1.4.4",NA,"R (>= 2.10)"
+"interp","1.1-3",NA,"R (>= 3.5.0)"
+"intervals","0.15.2",NA,"R (>= 2.9.0)"
+"ipred","0.9-13",NA,"R (>= 2.10)"
+"isoband","0.2.6",NA,NA
+"iterators","1.0.14",NA,"R (>= 2.5.0), utils"
+"jpeg","0.1-9",NA,"R (>= 2.9.0)"
+"jquerylib","0.1.4",NA,NA
+"jsonify","1.2.1",NA,"R (>= 3.3.0)"
+"jsonlite","1.8.2",NA,"methods"
+"kernlab","0.9-31",NA,"R (>= 2.10)"
+"knitr","1.40",NA,"R (>= 3.3.0)"
+"ks","1.13.5",NA,"R (>= 2.10.0)"
+"labeling","0.4.2",NA,NA
+"later","1.3.0",NA,NA
+"latticeExtra","0.6-30",NA,"R (>= 3.6.0), lattice"
+"lava","1.7.0",NA,"R (>= 3.0)"
+"lazyeval","0.2.2",NA,"R (>= 3.1.0)"
+"leafem","0.2.0",NA,"R (>= 3.1.0)"
+"leaflet","2.1.1",NA,"R (>= 3.1.0)"
+"leaflet.extras","1.0.0",NA,"R (>= 3.1.0), leaflet (>= 2.0.0)"
+"leaflet.providers","1.9.0",NA,"R (>= 2.10)"
+"lhs","1.1.5",NA,"R (>= 3.4.0)"
+"lifecycle","1.0.3",NA,"R (>= 3.4)"
+"listenv","0.8.0",NA,"R (>= 3.1.2)"
+"lmtest","0.9-40",NA,"R (>= 3.0.0), stats, zoo"
+"lubridate","1.8.0",NA,"methods, R (>= 3.2)"
+"lwgeom","0.2-9",NA,"R (>= 3.3.0)"
+"magrittr","2.0.3",NA,"R (>= 3.4.0)"
+"maptools","1.1-5",NA,"R (>= 2.10), sp (>= 1.0-11)"
+"markdown","1.2",NA,"R (>= 2.11.1)"
+"mathjaxr","1.6-0",NA,NA
+"Matrix","1.5-1","recommended","R (>= 3.5.0)"
+"mc2d","0.1-21",NA,"R (>= 2.10.0), mvtnorm"
+"mclust","6.0.0",NA,"R (>= 3.0)"
+"memoise","2.0.1",NA,NA
+"mime","0.12",NA,NA
+"miniUI","0.1.1.1",NA,NA
+"misc3d","0.9-1",NA,NA
+"mlbench","2.1-3",NA,"R (>= 2.10)"
+"ModelMetrics","1.2.2.2",NA,"R (>= 3.2.2)"
+"modelr","0.1.9",NA,"R (>= 3.2)"
+"modeltools","0.2-23",NA,"stats, stats4"
+"multicool","0.1-12",NA,"methods, Rcpp (>= 0.11.2)"
+"munsell","0.5.0",NA,NA
+"mvtnorm","1.1-3",NA,"R(>= 3.5.0)"
+"nloptr","2.0.3",NA,NA
+"numbers","0.8-2",NA,"R (>= 3.1.0)"
+"numDeriv","2016.8-1.1",NA,"R (>= 2.11.1)"
+"openssl","2.0.4",NA,NA
+"optimization","1.0-9",NA,"R (>= 3.2.0), Rcpp (>= 0.12.12)"
+"packrat","0.8.1",NA,"R (>= 3.0.0)"
+"pacman","0.5.1",NA,"R (>= 3.5.0)"
+"padr","0.6.1",NA,"R (>= 3.0.0)"
+"parallelly","1.32.1",NA,NA
+"partitions","1.10-7",NA,"R (>= 3.6.0)"
+"pillar","1.8.1",NA,NA
+"pkgconfig","2.0.3",NA,NA
+"pkgload","1.3.1",NA,"R (>= 3.4.0)"
+"plot3D","1.4",NA,"R (>= 2.15)"
+"plotly","4.10.0",NA,"R (>= 3.2.0), ggplot2 (>= 3.0.0)"
+"plotrix","3.8-2",NA,"R (>= 3.5.0)"
+"plyr","1.8.7",NA,"R (>= 3.1.0)"
+"png","0.1-7",NA,"R (>= 2.9.0)"
+"polynom","1.4-1",NA,NA
+"pracma","2.4.2",NA,"R (>= 3.1.0)"
+"praise","1.0.0",NA,NA
+"prettyunits","1.1.1",NA,NA
+"pROC","1.18.0",NA,"R (>= 2.14)"
+"processx","3.7.0",NA,"R (>= 3.4.0)"
+"prodlim","2019.11.13",NA,"R (>= 2.9.0)"
+"progress","1.2.2",NA,NA
+"progressr","0.11.0",NA,"R (>= 3.5.0)"
+"promises","1.2.0.1",NA,NA
+"proxy","0.4-27",NA,"R (>= 3.4.0)"
+"ps","1.7.1",NA,"R (>= 3.4)"
+"purrr","0.3.5",NA,"R (>= 3.2)"
+"R.cache","0.16.0",NA,"R (>= 2.14.0)"
+"R.methodsS3","1.8.2",NA,"R (>= 2.13.0)"
+"R.oo","1.25.0",NA,"R (>= 2.13.0), R.methodsS3 (>= 1.8.1)"
+"R.rsp","0.45.0",NA,"R (>= 2.14.0)"
+"R.utils","2.12.1",NA,"R (>= 2.14.0), R.oo (>= 1.24.0)"
+"R6","2.5.1",NA,"R (>= 3.0)"
+"randomForest","4.7-1.1",NA,"R (>= 4.1.0), stats"
+"randtoolbox","2.0.2",NA,"rngWELL (>= 0.10-1)"
+"RANN","2.6.1",NA,NA
+"rapidjsonr","1.2.0",NA,NA
+"rappdirs","0.3.3",NA,"R (>= 3.2)"
+"raster","3.6-3",NA,"sp (>= 1.4-5), R (>= 3.5.0)"
+"rbibutils","2.2.9",NA,"R (>= 2.10)"
+"RColorBrewer","1.1-3",NA,"R (>= 2.0.0)"
+"Rcpp","1.0.9",NA,NA
+"RcppArmadillo","0.11.4.0.1",NA,"R (>= 3.3.0)"
+"RcppEigen","0.3.3.9.2",NA,NA
+"RcppParallel","5.1.5",NA,"R (>= 3.0.2)"
+"RcppThread","2.1.3",NA,"R (>= 3.3.0)"
+"Rdpack","2.4",NA,"R (>= 2.15.0), methods"
+"readr","2.1.3",NA,"R (>= 3.4)"
+"readxl","1.4.1",NA,"R (>= 3.4)"
+"recipes","1.0.2",NA,"dplyr, R (>= 3.4)"
+"rematch","1.0.1",NA,NA
+"rematch2","2.1.2",NA,NA
+"remotes","2.4.2",NA,"R (>= 3.0.0)"
+"reprex","2.0.2",NA,"R (>= 3.4)"
+"reshape","0.8.9",NA,"R (>= 2.6.1)"
+"reshape2","1.4.4",NA,"R (>= 3.1)"
+"rex","1.2.1",NA,NA
+"rgdal","1.5-32",NA,"R (>= 3.5.0), methods, sp (>= 1.1-0)"
+"rgl","0.110.2",NA,"R (>= 3.3.0)"
+"rlang","1.0.6",NA,"R (>= 3.4.0)"
+"rmarkdown","2.17",NA,"R (>= 3.0)"
+"rngWELL","0.10-7",NA,"R (>= 3.0.0)"
+"rprojroot","2.0.3",NA,"R (>= 3.0.0)"
+"rsconnect","0.8.28",NA,"R (>= 3.0.0)"
+"RSpectra","0.16-1",NA,"R (>= 3.0.2)"
+"rstudioapi","0.14",NA,NA
+"RUnit","0.4.32",NA,"R (>= 2.5.0), utils (>= 2.5.0), methods (>= 2.5.0), graphics
+(>= 2.5.0)"
+"rvest","1.0.3",NA,"R (>= 3.2)"
+"s2","1.1.0",NA,"R (>= 3.0.0)"
+"sass","0.4.2",NA,NA
+"scales","1.2.1",NA,"R (>= 3.2)"
+"scatterplot3d","0.3-42",NA,"R (>= 2.7.0)"
+"selectr","0.4-2",NA,"R (>= 3.0)"
+"sensitivity","1.28.0",NA,"R (>= 3.0.0)"
+"sets","1.0-21",NA,"R (>= 2.7.0)"
+"sf","1.0-8",NA,"methods, R (>= 3.3.0)"
+"sfheaders","0.4.0",NA,NA
+"sftime","0.2-0",NA,"sf (>= 1.0.7)"
+"shiny","1.7.2",NA,"R (>= 3.0.2), methods"
+"shinyAce","0.4.2",NA,"R (>= 3.3.0)"
+"shinyBS","0.61.1",NA,NA
+"shinybusy","0.3.1",NA,NA
+"shinycssloaders","1.0.0",NA,"R (>= 3.1)"
+"shinydashboard","0.7.2",NA,"R (>= 3.0)"
+"shinyFiles","0.9.3",NA,NA
+"shinyjqui","0.4.1",NA,"R (>= 3.2.0)"
+"shinyjs","2.1.0",NA,"R (>= 3.1.0)"
+"shinytoastr","2.1.1",NA,NA
+"shinyWidgets","0.7.4",NA,"R (>= 3.1.0)"
+"sm","2.2-5.7.1",NA,"R (>= 3.1.0)"
+"sourcetools","0.1.7",NA,"R (>= 3.0.2)"
+"sp","1.5-0",NA,"R (>= 3.0.0), methods"
+"spacetime","1.2-8",NA,"R (>= 3.0.0)"
+"spsComps","0.3.2.1",NA,"R (>= 4.0.0), shiny (>= 1.5.0)"
+"spsUtil","0.2.2",NA,"R (>= 4.0.0)"
+"SQUAREM","2021.1",NA,"R (>= 3.0)"
+"stars","0.5-6",NA,"R (>= 3.3.0), abind, sf (>= 1.0-8)"
+"stringi","1.7.8",NA,"R (>= 3.1)"
+"stringr","1.4.1",NA,"R (>= 3.1)"
+"sys","3.4.1",NA,NA
+"tableHTML","2.1.0",NA,"R (>= 3.2.0)"
+"terra","1.6-17",NA,"R (>= 3.5.0)"
+"testthat","3.1.5",NA,"R (>= 3.1)"
+"tibble","3.1.8",NA,"R (>= 3.1.0)"
+"tidyr","1.2.1",NA,"R (>= 3.1)"
+"tidyselect","1.2.0",NA,"R (>= 3.4)"
+"tidyverse","1.3.2",NA,"R (>= 3.3)"
+"timeDate","4021.106",NA,"R (>= 3.6.0)"
+"tinytex","0.42",NA,NA
+"tippy","0.1.0",NA,"R (>= 3.4.0)"
+"triangle","0.12",NA,"R (>= 2.14.1)"
+"TSP","1.2-1",NA,"R (>= 3.5.0)"
+"tzdb","0.3.0",NA,"R (>= 3.4.0)"
+"units","0.8-0",NA,"R (>= 3.0.2)"
+"utf8","1.2.2",NA,"R (>= 2.10)"
+"uuid","1.1-0",NA,"R (>= 2.9.0)"
+"vcd","1.4-10",NA,"R (>= 2.4.0), grid"
+"vctrs","0.4.2",NA,"R (>= 3.3)"
+"vioplot","0.3.7",NA,"sm, zoo"
+"viridis","0.6.2",NA,"R (>= 2.10), viridisLite (>= 0.4.0)"
+"viridisLite","0.4.1",NA,"R (>= 2.10)"
+"vroom","1.6.0",NA,"R (>= 3.4)"
+"waiter","0.2.5",NA,NA
+"waldo","0.4.0",NA,NA
+"webshot","0.5.4",NA,"R (>= 3.0)"
+"whitening","1.4.0",NA,"R (>= 3.5.0), corpcor (>= 1.6.10)"
+"withr","2.5.0",NA,"R (>= 3.2.0)"
+"wk","0.7.0",NA,"R (>= 2.10)"
+"xfun","0.34",NA,NA
+"xml2","1.3.3",NA,"R (>= 3.1.0)"
+"xtable","1.8-4",NA,"R (>= 2.10.0)"
+"xts","0.12.2",NA,"zoo (>= 1.7-12)"
+"yaml","2.3.6",NA,NA
+"zoo","1.8-11",NA,"R (>= 3.1.0), stats"
+"base","4.2.1","base",NA
+"boot","1.3-28","recommended","R (>= 3.0.0), graphics, stats"
+"class","7.3-20","recommended","R (>= 3.0.0), stats, utils"
+"cluster","2.1.3","recommended","R (>= 3.5.0)"
+"codetools","0.2-18","recommended","R (>= 2.1)"
+"compiler","4.2.1","base",NA
+"datasets","4.2.1","base",NA
+"foreign","0.8-82","recommended","R (>= 4.0.0)"
+"graphics","4.2.1","base",NA
+"grDevices","4.2.1","base",NA
+"grid","4.2.1","base",NA
+"KernSmooth","2.23-20","recommended","R (>= 2.5.0), stats"
+"lattice","0.20-45","recommended","R (>= 3.0.0)"
+"MASS","7.3-57","recommended","R (>= 3.3.0), grDevices, graphics, stats, utils"
+"Matrix","1.4-1","recommended","R (>= 3.5.0)"
+"methods","4.2.1","base",NA
+"mgcv","1.8-40","recommended","R (>= 3.6.0), nlme (>= 3.1-64)"
+"nlme","3.1-157","recommended","R (>= 3.5.0)"
+"nnet","7.3-17","recommended","R (>= 3.0.0), stats, utils"
+"parallel","4.2.1","base",NA
+"rpart","4.1.16","recommended","R (>= 2.15.0), graphics, stats, grDevices"
+"spatial","7.3-15","recommended","R (>= 3.0.0), graphics, stats, utils"
+"splines","4.2.1","base",NA
+"stats","4.2.1","base",NA
+"stats4","4.2.1","base",NA
+"survival","3.3-1","recommended","R (>= 3.5.0)"
+"tcltk","4.2.1","base",NA
+"tools","4.2.1","base",NA
+"translations","4.2.1",NA,NA
+"utils","4.2.1","base",NA
