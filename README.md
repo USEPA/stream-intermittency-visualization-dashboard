@@ -52,7 +52,7 @@ The steps below outline the process of setting up the example dashboard on a Win
 
 
 ## Software
-The dashboard was developed with R software, version 4.1.0, on a Windows computer.  
+The dashboard was developed with R software, version 4.1.0, on a Windows computer.  The code may need to be adapted to run on other operating systems. Please see SIVD_dependencies.csv for a list of all of the libraries used by the app and their dependencies.  
 
 ## References
 * [Chapin, T.P., Todd, A.S. and Zeigler, M.P., 2014. Robust, low‐cost data loggers for stream temperature, flow intermittency, and relative conductivity monitoring. Water Resources Research, 50(8), pp.6542-6548.](https://doi.org/10.1002/2013WR015158)
