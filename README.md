@@ -18,11 +18,11 @@ There are four CSV files containing the data used by the application.
 * S123_field_data_2022-03-15.csv
 
 ### Getting Started
-The steps below outline the process of setting up the example dashboard.
+The steps below outline the process of setting up the example dashboard on a Windows computer.
 * Background Steps: If R and RStudio are not installed on the computer, please follow these steps:
-	* [Download R] (https://www.r-project.org/) and install.
-	* [Download RStudio] (https://posit.co/) and install. R should be installed before RStudio.
-* Step 1: [Click here] (https://github.com/USEPA/stream-intermittency-visualization-dashboard/archive/refs/heads/main.zip) to download the code files and the data files listed in the Code section and Data section.
+	* [Download R](https://www.r-project.org/) and install.
+	* [Download RStudio](https://posit.co/) and install. R should be installed before RStudio.
+* Step 1: [Click here](https://github.com/USEPA/stream-intermittency-visualization-dashboard/archive/refs/heads/main.zip) to download the code files and the data files listed in the Code section and Data section.
 * Step 2: Extract the downloaded file into a new project folder on your local machine. The folder should have the same structure as provided below.
 
 ``` bash
