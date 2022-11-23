@@ -9,6 +9,8 @@ Code in this repository can be used to generate the Shiny dashboard.  There are 
 	* Contains the UI, server, and ShinyApp call that create the dashboard
 * HTML_tables.R
 	* Contains the code to generate the HTML tables in the dashboard
+	
+Alternatively, if you do not wish to set up the application on your own, the SIVD example app can be accessed on the web [here](https://ecosystemplanningrestoration.shinyapps.io/SIVD_hp/).  
 
 ### Data
 There are four CSV files containing the data used by the application.
