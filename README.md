@@ -19,6 +19,8 @@ There are four CSV files containing the data used by the application.
 * GP_P1-3_summary_2022-03-16.csv
 * S123_field_data_2022-03-15.csv
 
+** Data descriptions can be found [here](https://github.com/USEPA/stream-intermittency-visualization-dashboard/blob/ba67ec9a9bf5347ac14d9073a115dfd9b85e4107/Data/column_descriptions.csv).
+
 ### Getting Started
 The steps below outline the process of setting up the example dashboard on a Windows computer.
 * Background Steps: If R and RStudio are not installed on the computer, please follow these steps:
