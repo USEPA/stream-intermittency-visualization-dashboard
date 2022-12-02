@@ -32,6 +32,13 @@ s123.data <- as.data.frame(read.csv(
         "./Data/S123_field_data_2022-03-22.csv",
         stringsAsFactors = FALSE)) 
 
+# data descriptions
+data.desc <- as.data.frame(read.csv(
+        "./Data/column_descriptions.csv",
+        stringsAsFactors = FALSE)) %>%
+        distinct(Column, Description) %>%
+        arrange(Column)
+
 # Selection Lists
 log.sc <- paste0(unique(log.data.raw$Site.Code, sep = ""))
 log.state <- paste0(unique(log.data.sum$state.name, sep = ""))
@@ -152,6 +159,13 @@ ui <- dashboardPage(
                                                               selected = names(s123.data))
                                          ),
                                          tabName = "field_data"),
+                                 convertMenuItem(
+                                         menuItem("Data Descriptions",
+                                                  tabName = "data_desc",
+                                                  icon = icon("circle-info")
+                                      
+                                         ),
+                                         tabName = "data_desc"),
                                  convertMenuItem(
                                          menuItem("Dashboard Help",
                                                   tabName = "dash_help",
@@ -388,6 +402,21 @@ ui <- dashboardPage(
                                     solidHeader = TRUE,
                                     div(style = 'overflow-x: scroll',
                                         DT::dataTableOutput("fielddata")
+                                    )
+                                )
+                        ),
+                        ## Data Description tab----------------------------------
+                        tabItem(tabName = "data_desc",
+                                tags$head(tags$style(HTML( '.has-feedback .form-control { padding-right: 0px; width: 150% !important}' ))),
+                                setBackgroundColor(c("#798291", "#f5faf6"),
+                                                   gradient = "linear", direction = "left",
+                                                   shinydashboard = TRUE),
+                                box(width = 6,
+                                    status = "danger",
+                                    title = "Data Descriptions",
+                                    solidHeader = TRUE,
+                                    div(style = 'overflow-x: scroll',
+                                        DT::dataTableOutput("datadesc")
                                     )
                                 )
                         ),
@@ -2358,6 +2387,26 @@ server <- function(input, output, session) {
                         )
                 })
         })
+
+                output$datadesc <- renderDT(server = FALSE, {
+                        DT::datatable(data.desc,
+                                      extensions = c('Buttons'),
+                                      # escape = FALSE,
+                                      # filter = "top",
+                                      options = list(
+                                              autoWidth = TRUE,
+                                              fixedColumns = TRUE,
+                                              scrollx = FALSE,
+                                              lengthMenu = c(5, 10, 15),
+                                              pageLength = 15,
+                                              columnDefs = list(list(className = 'dt-center',
+                                                                     targets = "_all"),
+                                                                list(width = '100px', 
+                                                                     targets = "_all"))
+                                      )
+                        )
+                })
+
 
         
         

@@ -1,0 +1,64 @@
+﻿File,Column,Description
+GP_P1-3_logger_daily_2022-03-22.csv,Site.Code,Unique ID for Sites
+GP_P1-3_logger_daily_2022-03-22.csv,Site.L,Logger ID at Site (L1 or L2)
+GP_P1-3_logger_daily_2022-03-22.csv,loggerID,Unique logger ID
+GP_P1-3_logger_daily_2022-03-22.csv,day,Date
+GP_P1-3_logger_daily_2022-03-22.csv,cal.intensity.lum_ft2,Calibration Intensity for Logger in Lum/ft^2
+GP_P1-3_logger_daily_2022-03-22.csv,period,Data Period
+GP_P1-3_logger_daily_2022-03-22.csv,mean.intensity.lum_ft2,Daily Mean Logger Intensity in Lum/ft^2
+GP_P1-3_logger_daily_2022-03-22.csv,mean.temp.f,Mean Daily Temperature in Fahrenheit
+GP_P1-3_logger_daily_2022-03-22.csv,flow.binary.day,"Binary Value for Flow. 0 = No Flow, 1 = Flow. "
+GP_P1-3_logger_daily_2022-03-22.csv,UID,Unique ID for Logger and Site Code (Site.Code + Site.L)
+GP_P1-3_logger_daily_2022-03-22.csv,per1.start,Start of Data Period 1
+GP_P1-3_logger_daily_2022-03-22.csv,per1.end.date,Data Period 1 End Date
+GP_P1-3_logger_daily_2022-03-22.csv,per2.end.date,Data Period 2 End Date
+GP_P1-3_logger_daily_2022-03-22.csv,per3.end.date,Data Period 3 End Date
+GP_P1-3_logger_daily_2022-03-22.csv,recLength,Expected Length of Record in Days
+GP_P1-3_logger_daily_2022-03-22.csv,total.rec.values,Total Recorded Days
+GP_P1-3_logger_daily_2022-03-22.csv,state.abb,State Abbreviation 
+GP_P1-3_logger_daily_2022-03-22.csv,state.name,State Name
+GP_P1-3_logger_daily_2022-03-22.csv,Latitude,Latitude
+GP_P1-3_logger_daily_2022-03-22.csv,Longitude,Longitude
+GP_P1-3_logger_daily_2022-03-22.csv,precip.inches,PRISM Precip. In Inches
+GP_P1-3_logger_daily_2022-03-22.csv,rec.start.date,Record Start Date
+GP_P1-3_logger_daily_2022-03-22.csv,rec.end.date,Record End Date
+GP_P1-3_logger_daily_2022-03-22.csv,missing.rec,Missing Record Days
+GP_P1-3_logger_hourly_2022-03-22.csv,Site.Code,Unique ID for Sites
+GP_P1-3_logger_hourly_2022-03-22.csv,Site.L,Logger ID at Site (L1 or L2)
+GP_P1-3_logger_hourly_2022-03-22.csv,DateFormat,Date/Time for Logger Intensity Record
+GP_P1-3_logger_hourly_2022-03-22.csv,loggerID,Unique logger ID
+GP_P1-3_logger_hourly_2022-03-22.csv,intensity.lum_ft2,Logger Intensity in Lum/ft^2
+GP_P1-3_logger_hourly_2022-03-22.csv,Temp.F,Temperature in Fahrenheit
+GP_P1-3_logger_hourly_2022-03-22.csv,UID,Unique ID for Logger and Site Code (Site.Code + Site.L)
+GP_P1-3_summary_2022-03-22.csv,UID,Unique ID for Logger and Site Code (Site.Code + Site.L)
+GP_P1-3_summary_2022-03-22.csv,Site.Code,Unique ID for Sites
+GP_P1-3_summary_2022-03-22.csv,total.consect.days,Total Consecutive Days of Data
+GP_P1-3_summary_2022-03-22.csv,consecutive.start.date,End Date of Consecutive Period
+GP_P1-3_summary_2022-03-22.csv,consecutive.end.date,Start Date of Consecutive Period
+GP_P1-3_summary_2022-03-22.csv,myear,Maximum continuous duration of flow days
+GP_P1-3_summary_2022-03-22.csv,dyear,Maximum continuous duration of no flow days
+GP_P1-3_summary_2022-03-22.csv,total.data.days,Total Days of Data
+GP_P1-3_summary_2022-03-22.csv,total.flow.days,Total Days of Flow
+GP_P1-3_summary_2022-03-22.csv,rec.start.date,Record Start Date
+GP_P1-3_summary_2022-03-22.csv,rec.end.date,Record End Date
+GP_P1-3_summary_2022-03-22.csv,recLength,Expected Length of Record in Days
+GP_P1-3_summary_2022-03-22.csv,total.rec.values,Total Record Values
+GP_P1-3_summary_2022-03-22.csv,total.rec.perc,Record Completeness Percentage
+GP_P1-3_summary_2022-03-22.csv,lengthRecordRaw,Years of Data
+GP_P1-3_summary_2022-03-22.csv,recency.confidence,(High: Last observation within 1 year; Moderate: Last observation within 5 years; Low: Last observation > 5 years ago)
+GP_P1-3_summary_2022-03-22.csv,length.of.record.confidence,(High: >= 10 years; Moderate: 2-10 years; Low: < 2 years)
+GP_P1-3_summary_2022-03-22.csv,completeness.of.record.confidence,(High: > 90%; Moderate: > 75%; Low: < 75%)
+GP_P1-3_summary_2022-03-22.csv,state.abb,State Abbreviation 
+GP_P1-3_summary_2022-03-22.csv,state.name,State Name
+S123_field_data_2022-03-22.csv,Site.Code,Unique ID for Sites
+S123_field_data_2022-03-22.csv,VisitNo,Field Visit Number
+S123_field_data_2022-03-22.csv,bankfullwidth_m,Bankfull Width in Meters
+S123_field_data_2022-03-22.csv,water_depth_cm,Water Depth in Centimeters at Time of Visit
+S123_field_data_2022-03-22.csv,hydro_conditions,Recorded Hydrologic Conditions at Time of Visit
+S123_field_data_2022-03-22.csv,hi_reachlengthsurface,Percent of Reach with Surface Flow
+S123_field_data_2022-03-22.csv,hi_reachlengthsub,Perecent of Reach with Subsurface Flow
+S123_field_data_2022-03-22.csv,hi_channelscore,Level of flow in channel (0: poor to 6: strong)
+S123_field_data_2022-03-22.csv,per1.start,Start of Data Period 1
+S123_field_data_2022-03-22.csv,per1.end,Data Period 1 End Date
+S123_field_data_2022-03-22.csv,per2.end,Data Period 2 End Date
+S123_field_data_2022-03-22.csv,per3.end,Data Period 3 End Date
